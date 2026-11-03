@@ -13,3 +13,6 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+filterwarnings = [
+    "ignore:Series.values returning an ndarray that drops timezone:pandas.errors.Pandas4Warning",
+]
