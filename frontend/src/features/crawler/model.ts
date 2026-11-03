@@ -77,6 +77,7 @@ export type TapJob = {
 
 export type Goal =
   | { kind: 'data'; bar: number }
+  | { kind: 'scan' }
   | { kind: 'stage'; point: Point }
   | { kind: 'checks' }
   | { kind: 'hold' }
@@ -90,6 +91,7 @@ export type CrawlerModel = {
   stages: Record<Stage, StageStatus>
   barCount: number
   beamBar: number | null
+  scanCursor: number
   dragStage: Stage | null
   nodes: WebNode[]
   links: Map<string, WebLink>
@@ -143,6 +145,7 @@ export function createModel(
     stages: freshStages(),
     barCount: 400,
     beamBar: null,
+    scanCursor: 0,
     dragStage: null,
     nodes: [
       ...CHECK_IDS.map((id) => makeNode(checkNodeId(id), 'check', 2.4)),
@@ -219,6 +222,13 @@ export function spawnSpider(model: CrawlerModel): void {
 }
 
 const SWEEP_STAGES: readonly Stage[] = ['DATA', 'SIGNALS', 'SIMULATOR']
+const SCAN_STAGES: readonly Stage[] = ['DATA', 'SIGNALS']
+export const SCAN_ZIGZAGS = 2
+export const SCAN_AMPLITUDE = 0.15
+export const SCAN_PRICE_PULL = 0.5
+export const SCAN_STEP = 0.002
+export const SCAN_LOOKAHEAD = 1.6
+export const SCAN_MAX_CATCH_UP = 0.8
 
 export function setStageProgress(model: CrawlerModel, stage: Stage, progress: number): void {
   const status = model.stages[stage]
@@ -231,14 +241,11 @@ export function setStageProgress(model: CrawlerModel, stage: Stage, progress: nu
   if (starting) {
     model.dragStage = stage
     if (SWEEP_STAGES.includes(stage)) model.beamBar = 0
+    if (stage === 'DATA') model.scanCursor = 0
     if (stage === 'AUDITOR') model.goal = { kind: 'checks' }
     if (stage === 'COSTS' || stage === 'REPORTER') model.beamBar = null
   }
-  if (SWEEP_STAGES.includes(stage) && stage !== 'SIMULATOR' && status.state === 'run') {
-    const bar = (clamped / 100) * (model.barCount - 1)
-    model.beamBar = bar
-    model.goal = { kind: 'data', bar }
-  }
+  if (SCAN_STAGES.includes(stage) && status.state === 'run') model.goal = { kind: 'scan' }
   if (stage === 'SIMULATOR' && status.state === 'run' && starting) model.goal = { kind: 'data', bar: 0 }
 }
 
@@ -409,10 +416,73 @@ export function activity(model: CrawlerModel): number {
   }
 }
 
+export function scanLimit(model: CrawlerModel): number {
+  return (model.stages.DATA.progress + model.stages.SIGNALS.progress) / 200
+}
+
+const triangle = (t: number) => 1 - 4 * Math.abs((((t + 0.25) % 1) + 1) % 1 - 0.5)
+
+export function scanPosition(fraction: number, barCount: number): { bar: number; wave: number } {
+  const f = Math.min(1, Math.max(0, fraction))
+  const signals = f > 0.5
+  const local = signals ? (f - 0.5) * 2 : f * 2
+  const across = signals ? 1 - local : local
+  return {
+    bar: across * Math.max(0, barCount - 1),
+    wave: triangle(local * SCAN_ZIGZAGS + (signals ? 0.5 : 0)),
+  }
+}
+
+export function scanPoint(model: CrawlerModel, fraction: number, input: Pick<FrameInput, 'measure' | 'project' | 'priceAt'>): Point {
+  const { plot } = input.measure
+  const { bar, wave } = scanPosition(fraction, model.barCount)
+  const price = input.priceAt(bar)
+  const point = price === null ? null : input.project(bar, price)
+  const x = point ? point.x : plot.left + (bar / Math.max(1, model.barCount - 1)) * plot.width
+  const middle = plot.top + plot.height * 0.5
+  const base = point ? middle + (point.y - middle) * SCAN_PRICE_PULL : middle
+  const y = base + wave * SCAN_AMPLITUDE * plot.height
+  return {
+    x: Math.min(plot.left + plot.width - 12, Math.max(plot.left + 12, x)),
+    y: Math.min(plot.top + plot.height * 0.9, Math.max(plot.top + plot.height * 0.12, y)),
+  }
+}
+
+function advanceScan(model: CrawlerModel, input: FrameInput): Point {
+  const spider = model.spider
+  const limit = scanLimit(model)
+  if (model.reducedMotion || !spider) model.scanCursor = Math.max(model.scanCursor, limit)
+  else {
+    const lookahead = spider.length * SCAN_LOOKAHEAD
+    let point = scanPoint(model, model.scanCursor, input)
+    while (model.scanCursor < limit && Math.hypot(point.x - spider.x, point.y - spider.y) < lookahead) {
+      model.scanCursor = Math.min(limit, model.scanCursor + SCAN_STEP)
+      point = scanPoint(model, model.scanCursor, input)
+    }
+    const behind = limit - model.scanCursor
+    spider.cruise = behind > SCAN_STEP
+    spider.tempo = model.tempo * (1 + Math.min(SCAN_MAX_CATCH_UP, behind * 2))
+  }
+  model.beamBar = scanPosition(model.scanCursor, model.barCount).bar
+  return scanPoint(model, model.scanCursor, input)
+}
+
 export function retractAmount(model: CrawlerModel, now: number): number {
   if (model.phase !== 'failed') return 0
   if (model.reducedMotion) return 1
   return Math.min(1, Math.max(0, (now - model.failedAt) / RETRACT_MS))
+}
+
+export function webRadius(model: CrawlerModel): number {
+  return model.params.webRadius * bodyLength(model.params)
+}
+
+export function nearSpider(model: CrawlerModel, node: WebNode): number {
+  const spider = model.spider
+  if (!spider || spider.airborne) return 0
+  const radius = webRadius(model)
+  const distance = Math.hypot(node.x - spider.x, node.y - spider.y)
+  return Math.min(1, Math.max(0, (radius - distance) / (radius * 0.35)))
 }
 
 function nodeVisible(model: CrawlerModel, node: WebNode): number {
@@ -420,13 +490,14 @@ function nodeVisible(model: CrawlerModel, node: WebNode): number {
   if (model.phase === 'idle' && !model.spider) return 0
   switch (node.kind) {
     case 'ambient':
-      return 1
+      return nearSpider(model, node)
     case 'anchor':
-      return model.stages.DATA.progress >= 100 || model.phase === 'idle' ? 1 : 0
+      return model.stages.DATA.progress >= 100 || model.phase === 'idle' ? nearSpider(model, node) : 0
     case 'check':
       return model.stages.AUDITOR.state !== 'wait' ? 1 : 0
     case 'cluster':
-      return node.data ? 1 : 0
+      if (!node.data) return 0
+      return model.wrap || model.lasso ? 1 : nearSpider(model, node)
   }
 }
 
@@ -466,6 +537,8 @@ function resolveGoal(model: CrawlerModel, input: FrameInput): Point | null {
       return model.spider ? { x: model.spider.x, y: model.spider.y } : null
     case 'stage':
       return goal.point
+    case 'scan':
+      return advanceScan(model, input)
     case 'checks': {
       const auditor = ports[STAGES.indexOf('AUDITOR')]
       return auditor ? { x: auditor.x, y: auditor.y + 130 } : null
@@ -652,6 +725,7 @@ export function stepModel(model: CrawlerModel, input: FrameInput): void {
   const spider = model.spider
   if (!spider) return
   spider.tempo = model.tempo
+  spider.cruise = false
 
   if (spider.state !== 'frozen') {
     let target: Point | null = null

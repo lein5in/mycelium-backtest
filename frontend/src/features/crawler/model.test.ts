@@ -7,16 +7,21 @@ import {
   finishRun,
   pulseNode,
   retractAmount,
+  scanLimit,
+  scanPoint,
+  scanPosition,
   setAnchors,
   setBeam,
   setStageProgress,
   setTempo,
   startRun,
   stepModel,
+  webRadius,
   wrapRegion,
   type CrawlerModel,
 } from './model'
-import { MAX_NODES } from './params'
+import { BODY_LENGTH_1X, DEFAULT_PARAMS, MAX_NODES } from './params'
+import { footThreads } from './renderer'
 import { liftedLegs } from './spider'
 import type { CrawlerMeasure } from './types'
 
@@ -235,5 +240,111 @@ describe('crawler model: reduced motion', () => {
     run(model, now, 16)
     const target = project(0.5 * 399, 0.5)
     expect(model.spider?.x).toBeCloseTo(target.x, 0)
+  })
+})
+
+describe('crawler model: no background web by default', () => {
+  it('defaults to no ambient nodes and a spider 1.6 times the 1x scale', () => {
+    const model = createModel(1, false)
+    expect(DEFAULT_PARAMS.spiderScale).toBe(1.6)
+    expect(model.nodes.some((n) => n.kind === 'ambient')).toBe(false)
+    const { model: running } = landed()
+    expect(running.spider?.length).toBeCloseTo(BODY_LENGTH_1X * 1.6)
+  })
+
+  it('shows only nodes and links near the spider, even with anchors all over the plot', () => {
+    const { model, now } = landed()
+    setAnchors(
+      model,
+      Array.from({ length: 12 }, (_, index) => ({ bar: (index % 4) * 120 + 20, price: 0.15 + Math.floor(index / 4) * 0.35 })),
+    )
+    setStageProgress(model, 'DATA', 100)
+    run(model, now, 4000)
+    const spider = model.spider
+    if (!spider) throw new Error('spider missing')
+    const radius = webRadius(model)
+    const byId = new Map(model.nodes.map((n) => [n.id, n]))
+    for (const node of model.nodes) {
+      if (node.kind === 'check') continue
+      if (Math.hypot(node.x - spider.x, node.y - spider.y) > radius * 1.5) expect(node.visibility).toBeLessThan(0.05)
+    }
+    for (const link of model.links.values()) {
+      const a = byId.get(link.a)
+      const b = byId.get(link.b)
+      if (!a || !b || link.alpha * Math.min(a.visibility, b.visibility) < 0.03) continue
+      expect(Math.hypot(a.x - spider.x, a.y - spider.y)).toBeLessThan(radius * 1.5)
+      expect(Math.hypot(b.x - spider.x, b.y - spider.y)).toBeLessThan(radius * 1.5)
+    }
+  })
+
+  it('attaches threads only to planted feet, each ending on a visible node within leg reach', () => {
+    const { model, now } = landed()
+    setAnchors(model, Array.from({ length: 12 }, (_, index) => ({ bar: 40 + index * 30, price: 0.5 + (index % 3) * 0.05 })))
+    setStageProgress(model, 'DATA', 100)
+    run(model, now, 4000)
+    const spider = model.spider
+    if (!spider) throw new Error('spider missing')
+    const planted = spider.legs.filter((l) => l.lift <= 0.15 && !l.override).map((l) => l.foot)
+    const threads = footThreads(model)
+    const ends = threads.map((t) => `${t.to.x}:${t.to.y}`)
+    expect(new Set(ends).size).toBe(ends.length)
+    for (const thread of threads) {
+      expect(planted).toContain(thread.from)
+      const outward = (thread.from.x - spider.x) * (thread.to.x - thread.from.x) + (thread.from.y - spider.y) * (thread.to.y - thread.from.y)
+      expect(outward).toBeGreaterThan(0)
+      expect(Math.hypot(thread.to.x - thread.from.x, thread.to.y - thread.from.y)).toBeLessThanOrEqual(
+        spider.reach * spider.length * 1.2,
+      )
+    }
+  })
+})
+
+describe('crawler model: loading walk', () => {
+  const pathInput = { measure, project, priceAt }
+
+  it('sweeps left to right during DATA and back during SIGNALS, zigzagging over price levels', () => {
+    const model = createModel(1, false)
+    startRun(model, 400)
+    const xs = [0, 0.25, 0.5].map((f) => scanPoint(model, f, pathInput).x)
+    expect(xs[0]).toBeLessThan(xs[1] ?? 0)
+    expect(xs[1]).toBeLessThan(xs[2] ?? 0)
+    expect(scanPoint(model, 1, pathInput).x).toBeLessThan(xs[1] ?? 0)
+    const ys = Array.from({ length: 41 }, (_, i) => scanPoint(model, i / 80, pathInput).y)
+    expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(measure.plot.height * 0.25)
+    expect(scanPosition(0.5, 400).bar).toBeCloseTo(scanPosition(0.5 + 1e-9, 400).bar, 3)
+  })
+
+  it('covers distance in proportion to progress and never runs ahead of it', () => {
+    const { model, now } = landed()
+    let t = now
+    let walked = 0
+    const covered: number[] = []
+    for (const progress of [25, 50, 75, 100]) {
+      setStageProgress(model, 'DATA', progress)
+      for (let i = 0; i < 300; i += 1) {
+        const before = { x: model.spider?.x ?? 0, y: model.spider?.y ?? 0 }
+        t = run(model, t, 16)
+        walked += Math.hypot((model.spider?.x ?? 0) - before.x, (model.spider?.y ?? 0) - before.y)
+        expect(model.scanCursor).toBeLessThanOrEqual(scanLimit(model) + 1e-9)
+        expect(model.beamBar ?? 0).toBeLessThanOrEqual((progress / 100) * 399 + 1e-6)
+      }
+      covered.push(walked)
+    }
+    expect(model.scanCursor).toBeCloseTo(0.5, 2)
+    expect(covered[3]).toBeGreaterThan(measure.plot.width * 1.1)
+    const quarters = covered.map((value, index) => value - (covered[index - 1] ?? covered[0] ?? 0) * (index > 0 ? 1 : 0))
+    const first = quarters[0] ?? 0
+    for (const quarter of quarters.slice(1)) expect(quarter / first).toBeGreaterThan(0.5)
+  })
+
+  it('does not advance the walk without a progress event', () => {
+    const { model, now } = landed()
+    setStageProgress(model, 'DATA', 40)
+    const t = run(model, now, 6000)
+    const cursor = model.scanCursor
+    const x = model.spider?.x ?? 0
+    run(model, t, 3000)
+    expect(model.scanCursor).toBe(cursor)
+    expect(model.spider?.x).toBeCloseTo(x, 0)
   })
 })

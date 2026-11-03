@@ -27,6 +27,7 @@ export type Spider = {
   fold: number
   foldTarget: number
   airborne: boolean
+  cruise: boolean
   breath: number
   history: Point[]
   tempo: number
@@ -58,6 +59,7 @@ export function createSpider(position: Point, tuning: SpiderTuning, heading = Ma
     fold: 1,
     foldTarget: 1,
     airborne: false,
+    cruise: false,
     breath: 0,
     history: [],
     tempo: 1,
@@ -130,6 +132,8 @@ export function legJoints(spider: Spider, leg: Leg): { hip: Point; knee: Point; 
 
 export const MIN_STEP_MS = 70
 export const STRIDE_FRACTION = 0.42
+export const SETTLE_SPEED = 6
+export const SETTLE_THRESHOLD = 0.4
 
 export function stepDuration(spider: Spider): number {
   const base = BASE_STEP_MS / Math.max(0.25, spider.tempo) / (0.8 + 0.4 * spider.aggression)
@@ -179,7 +183,7 @@ export function moveBody(spider: Spider, dt: number): void {
     const distance = Math.hypot(dx, dy)
     if (distance > 0.01) {
       const maxSpeed = spider.speed * Math.min(MAX_SPEED_TEMPO, Math.max(0.25, spider.tempo)) * (0.75 + 0.5 * spider.aggression)
-      const speed = Math.min(maxSpeed, distance * 3.2)
+      const speed = spider.cruise ? maxSpeed : Math.min(maxSpeed, distance * 3.2)
       desiredX = (dx / distance) * speed
       desiredY = (dy / distance) * speed
     }
@@ -217,7 +221,8 @@ export function stepLegs(spider: Spider, context: StepContext): void {
   }
 
   const duration = stepDuration(spider)
-  const threshold = spider.stepThreshold * spider.length
+  const settling = Math.hypot(spider.vx, spider.vy) < SETTLE_SPEED
+  const threshold = spider.stepThreshold * spider.length * (settling ? SETTLE_THRESHOLD : 1)
   const lead = { x: spider.vx * (duration / 1000) * 2, y: spider.vy * (duration / 1000) * 2 }
   const wants = new Set<LegId>()
   for (const leg of spider.legs) {

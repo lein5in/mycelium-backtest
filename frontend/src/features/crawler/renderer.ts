@@ -184,6 +184,16 @@ export class CrawlerRenderer {
       path.moveTo(a.x, a.y)
       path.quadraticCurveTo(midX, midY, b.x, b.y)
     }
+    const threads = model.failedStage === null ? footThreads(model) : []
+    for (const thread of threads) {
+      const bucket = Math.min(BUCKETS - 1, Math.floor(((thread.alpha - 0.03) / 0.68) * BUCKETS))
+      const path = normal[bucket]
+      if (!path) continue
+      used[bucket] = true
+      this.stats.links += 1
+      path.moveTo(thread.from.x, thread.from.y)
+      path.lineTo(thread.to.x, thread.to.y)
+    }
     const bucketAlpha = (index: number) => 0.03 + ((index + 0.5) / BUCKETS) * 0.68
     normal.forEach((path, index) => {
       if (used[index]) this.glowStroke(path, theme.violet, bucketAlpha(index) * 0.4, 2.2 + index * 0.5, theme.violet)
@@ -458,6 +468,38 @@ export class CrawlerRenderer {
     context.fillRect(plot.left, plot.top + plot.height, stage.width - plot.left, stage.height - plot.top - plot.height)
     context.restore()
   }
+}
+
+export type FootThread = { from: Point; to: Point; alpha: number }
+
+export function footThreads(model: CrawlerModel): FootThread[] {
+  const spider = model.spider
+  if (!spider || spider.airborne || spider.state === 'frozen') return []
+  const reach = spider.reach * spider.length * 1.2
+  const candidates = model.nodes.filter((node) => node.kind !== 'check' && node.onScreen && node.visibility > 0.3)
+  const taken = new Set<string>()
+  const threads: FootThread[] = []
+  for (const leg of spider.legs) {
+    if (leg.lift > 0.15 || leg.override) continue
+    const outwardX = leg.foot.x - spider.x
+    const outwardY = leg.foot.y - spider.y
+    let best: WebNode | null = null
+    let bestDistance = reach
+    for (const node of candidates) {
+      if (taken.has(node.id)) continue
+      const dx = node.x - leg.foot.x
+      const dy = node.y - leg.foot.y
+      const distance = Math.hypot(dx, dy)
+      if (distance <= 3 || distance >= bestDistance || dx * outwardX + dy * outwardY <= 0) continue
+      best = node
+      bestDistance = distance
+    }
+    if (!best) continue
+    taken.add(best.id)
+    const alpha = (0.25 + 0.4 * (1 - bestDistance / reach)) * best.visibility
+    threads.push({ from: leg.foot, to: { x: best.x, y: best.y }, alpha })
+  }
+  return threads
 }
 
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)

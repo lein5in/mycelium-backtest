@@ -5,6 +5,7 @@ export type CrawlerParams = {
   spiderSpeed: number
   nodeCount: number
   linkDistance: number
+  webRadius: number
   rebuildInterval: number
   driftSpeed: number
   glowBlur: number
@@ -14,12 +15,13 @@ export type CrawlerParams = {
 export type ParamSpec = { label: string; min: number; max: number; step: number; unit: string }
 
 export const PARAM_SPECS: Record<keyof CrawlerParams, ParamSpec> = {
-  spiderScale: { label: 'Spider scale', min: 0.6, max: 1.8, step: 0.05, unit: '×' },
+  spiderScale: { label: 'Spider scale', min: 0.6, max: 2.6, step: 0.05, unit: '×' },
   legReach: { label: 'Leg reach', min: 1.6, max: 3.4, step: 0.05, unit: 'body' },
   stepThreshold: { label: 'Step threshold', min: 0.2, max: 1.2, step: 0.05, unit: 'body' },
-  spiderSpeed: { label: 'Spider speed', min: 60, max: 400, step: 10, unit: 'px/s' },
-  nodeCount: { label: 'Node count', min: 45, max: 70, step: 1, unit: '' },
+  spiderSpeed: { label: 'Spider speed', min: 60, max: 600, step: 10, unit: 'px/s' },
+  nodeCount: { label: 'Ambient nodes', min: 0, max: 70, step: 1, unit: '' },
   linkDistance: { label: 'Link distance', min: 80, max: 200, step: 5, unit: 'px' },
+  webRadius: { label: 'Web radius', min: 2, max: 40, step: 0.5, unit: 'body' },
   rebuildInterval: { label: 'Rebuild interval', min: 700, max: 1200, step: 10, unit: 'ms' },
   driftSpeed: { label: 'Drift speed', min: 0, max: 12, step: 0.5, unit: 'px/s' },
   glowBlur: { label: 'Glow blur', min: 0, max: 16, step: 0.5, unit: 'px' },
@@ -27,12 +29,13 @@ export const PARAM_SPECS: Record<keyof CrawlerParams, ParamSpec> = {
 }
 
 export const DEFAULT_PARAMS: CrawlerParams = {
-  spiderScale: 1,
+  spiderScale: 1.6,
   legReach: 2.3,
   stepThreshold: 0.55,
-  spiderSpeed: 220,
-  nodeCount: 64,
+  spiderSpeed: 340,
+  nodeCount: 0,
   linkDistance: 140,
+  webRadius: 3.5,
   rebuildInterval: 950,
   driftSpeed: 2.5,
   glowBlur: 6,
