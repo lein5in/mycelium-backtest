@@ -1,0 +1,36 @@
+:root {
+  --bg-app: #030405;
+  --bg-panel: #07090b;
+  --bg-panel-head: #0b0e11;
+  --bg-hover: #0e1216;
+  --bg-landing: #050810;
+  --border: #14191f;
+  --border-strong: #1e252d;
+  --grid: #0f1317;
+  --text: #d3dae2;
+  --text-2: #8a95a2;
+  --text-3: #707b87;
+  --accent: #2a86c4;
+  --accent-text: #6db6e6;
+  --violet: #7b5cc4;
+  --violet-text: #a58be0;
+  --cyan: #3a9db8;
+  --magenta: #b34a86;
+  --profit: #2c9b55;
+  --profit-text: #5fcb88;
+  --loss: #be3b34;
+  --loss-text: #e8746e;
+  --warn: #c4922e;
+  --warn-text: #e0b04f;
+  --node-core: #eef1f6;
+  --price-line: #aeb8c4;
+  --heat-0: #04070b;
+  --heat-1: #07101c;
+  --heat-2: #0b2342;
+  --heat-3: #14406f;
+  --heat-4: #6a4313;
+  --heat-5: #b06d1c;
+  --heat-6: #e0a33f;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}

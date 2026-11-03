@@ -1,0 +1,567 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mycelium-backtest/contracts/run_events.schema.json",
+  "title": "RunEvent",
+  "x-schema-version": 1,
+  "$defs": {
+    "CheckDone": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "check_done",
+          "default": "check_done",
+          "title": "Type",
+          "type": "string"
+        },
+        "check_id": {
+          "enum": [
+            "costs",
+            "trade_count",
+            "without_best_trade",
+            "out_of_sample",
+            "versus_random",
+            "robustness"
+          ],
+          "title": "Check Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "WARN",
+            "FAIL"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "figure": {
+          "maxLength": 120,
+          "title": "Figure",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "check_id",
+        "status",
+        "figure"
+      ],
+      "title": "CheckDone",
+      "type": "object"
+    },
+    "ClusterRegion": {
+      "additionalProperties": false,
+      "properties": {
+        "start_bar": {
+          "minimum": 0,
+          "title": "Start Bar",
+          "type": "integer"
+        },
+        "end_bar": {
+          "minimum": 0,
+          "title": "End Bar",
+          "type": "integer"
+        },
+        "price_low": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Price Low",
+          "type": "number"
+        },
+        "price_high": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Price High",
+          "type": "number"
+        }
+      },
+      "required": [
+        "start_bar",
+        "end_bar",
+        "price_low",
+        "price_high"
+      ],
+      "title": "ClusterRegion",
+      "type": "object"
+    },
+    "RunDone": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "run_done",
+          "default": "run_done",
+          "title": "Type",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "CREDIBLE",
+            "FRAGILE",
+            "NOT_CREDIBLE"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "verdict"
+      ],
+      "title": "RunDone",
+      "type": "object"
+    },
+    "RunFailed": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "run_failed",
+          "default": "run_failed",
+          "title": "Type",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "DATA",
+            "SIGNALS",
+            "SIMULATOR",
+            "COSTS",
+            "AUDITOR",
+            "REPORTER"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "stage",
+        "message"
+      ],
+      "title": "RunFailed",
+      "type": "object"
+    },
+    "RunStarted": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "run_started",
+          "default": "run_started",
+          "title": "Type",
+          "type": "string"
+        },
+        "bar_count": {
+          "minimum": 1,
+          "title": "Bar Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "bar_count"
+      ],
+      "title": "RunStarted",
+      "type": "object"
+    },
+    "StageDone": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "stage_done",
+          "default": "stage_done",
+          "title": "Type",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "DATA",
+            "SIGNALS",
+            "SIMULATOR",
+            "COSTS",
+            "AUDITOR",
+            "REPORTER"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "stage"
+      ],
+      "title": "StageDone",
+      "type": "object"
+    },
+    "StageProgress": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "stage_progress",
+          "default": "stage_progress",
+          "title": "Type",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "DATA",
+            "SIGNALS",
+            "SIMULATOR",
+            "COSTS",
+            "AUDITOR",
+            "REPORTER"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "progress": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Progress",
+          "type": "integer"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        },
+        "bar_index": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bar Index"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "stage",
+        "progress"
+      ],
+      "title": "StageProgress",
+      "type": "object"
+    },
+    "StageStarted": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "stage_started",
+          "default": "stage_started",
+          "title": "Type",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "DATA",
+            "SIGNALS",
+            "SIMULATOR",
+            "COSTS",
+            "AUDITOR",
+            "REPORTER"
+          ],
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "stage"
+      ],
+      "title": "StageStarted",
+      "type": "object"
+    },
+    "TradeCluster": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Run Id",
+          "type": "string"
+        },
+        "seq": {
+          "minimum": 0,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "ts": {
+          "format": "date-time",
+          "title": "Ts",
+          "type": "string"
+        },
+        "type": {
+          "const": "trade_cluster",
+          "default": "trade_cluster",
+          "title": "Type",
+          "type": "string"
+        },
+        "region": {
+          "$ref": "#/$defs/ClusterRegion"
+        },
+        "fills": {
+          "minimum": 1,
+          "title": "Fills",
+          "type": "integer"
+        },
+        "net_result": {
+          "title": "Net Result",
+          "type": "number"
+        }
+      },
+      "required": [
+        "run_id",
+        "seq",
+        "ts",
+        "region",
+        "fills",
+        "net_result"
+      ],
+      "title": "TradeCluster",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "check_done": "#/$defs/CheckDone",
+      "run_done": "#/$defs/RunDone",
+      "run_failed": "#/$defs/RunFailed",
+      "run_started": "#/$defs/RunStarted",
+      "stage_done": "#/$defs/StageDone",
+      "stage_progress": "#/$defs/StageProgress",
+      "stage_started": "#/$defs/StageStarted",
+      "trade_cluster": "#/$defs/TradeCluster"
+    },
+    "propertyName": "type"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/RunStarted"
+    },
+    {
+      "$ref": "#/$defs/StageStarted"
+    },
+    {
+      "$ref": "#/$defs/StageProgress"
+    },
+    {
+      "$ref": "#/$defs/StageDone"
+    },
+    {
+      "$ref": "#/$defs/TradeCluster"
+    },
+    {
+      "$ref": "#/$defs/CheckDone"
+    },
+    {
+      "$ref": "#/$defs/RunDone"
+    },
+    {
+      "$ref": "#/$defs/RunFailed"
+    }
+  ]
+}

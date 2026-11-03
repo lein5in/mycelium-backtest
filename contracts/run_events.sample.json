@@ -1,0 +1,676 @@
+[
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 0,
+    "ts": "2026-01-01T00:00:00Z",
+    "type": "run_started",
+    "bar_count": 400
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 1,
+    "ts": "2026-01-01T00:00:00.150000Z",
+    "type": "stage_started",
+    "stage": "DATA"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 2,
+    "ts": "2026-01-01T00:00:00.450000Z",
+    "type": "stage_progress",
+    "stage": "DATA",
+    "progress": 25,
+    "detail": "loading candles",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 3,
+    "ts": "2026-01-01T00:00:00.750000Z",
+    "type": "stage_progress",
+    "stage": "DATA",
+    "progress": 50,
+    "detail": "400 bars",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 4,
+    "ts": "2026-01-01T00:00:01.050000Z",
+    "type": "stage_progress",
+    "stage": "DATA",
+    "progress": 75,
+    "detail": "checking gaps",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 5,
+    "ts": "2026-01-01T00:00:01.350000Z",
+    "type": "stage_progress",
+    "stage": "DATA",
+    "progress": 100,
+    "detail": "400 bars · 0 gaps",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 6,
+    "ts": "2026-01-01T00:00:01.450000Z",
+    "type": "stage_done",
+    "stage": "DATA",
+    "detail": "400 bars · 0 gaps"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 7,
+    "ts": "2026-01-01T00:00:01.600000Z",
+    "type": "stage_started",
+    "stage": "SIGNALS"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 8,
+    "ts": "2026-01-01T00:00:01.880000Z",
+    "type": "stage_progress",
+    "stage": "SIGNALS",
+    "progress": 20,
+    "detail": "warm-up 14 bars",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 9,
+    "ts": "2026-01-01T00:00:02.160000Z",
+    "type": "stage_progress",
+    "stage": "SIGNALS",
+    "progress": 40,
+    "detail": "RSI(14)",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 10,
+    "ts": "2026-01-01T00:00:02.440000Z",
+    "type": "stage_progress",
+    "stage": "SIGNALS",
+    "progress": 60,
+    "detail": "entries",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 11,
+    "ts": "2026-01-01T00:00:02.720000Z",
+    "type": "stage_progress",
+    "stage": "SIGNALS",
+    "progress": 80,
+    "detail": "exits",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 12,
+    "ts": "2026-01-01T00:00:03Z",
+    "type": "stage_progress",
+    "stage": "SIGNALS",
+    "progress": 100,
+    "detail": "131 signals",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 13,
+    "ts": "2026-01-01T00:00:03.100000Z",
+    "type": "stage_done",
+    "stage": "SIGNALS",
+    "detail": "131 signals"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 14,
+    "ts": "2026-01-01T00:00:03.250000Z",
+    "type": "stage_started",
+    "stage": "SIMULATOR"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 15,
+    "ts": "2026-01-01T00:00:03.450000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 5,
+    "detail": "bar 20 / 400 · 6 trades",
+    "bar_index": 19
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 16,
+    "ts": "2026-01-01T00:00:03.650000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 10,
+    "detail": "bar 40 / 400 · 13 trades",
+    "bar_index": 39
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 17,
+    "ts": "2026-01-01T00:00:03.850000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 15,
+    "detail": "bar 60 / 400 · 19 trades",
+    "bar_index": 59
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 18,
+    "ts": "2026-01-01T00:00:04.050000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 20,
+    "detail": "bar 80 / 400 · 26 trades",
+    "bar_index": 79
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 19,
+    "ts": "2026-01-01T00:00:04.100000Z",
+    "type": "trade_cluster",
+    "region": {
+      "start_bar": 60,
+      "end_bar": 72,
+      "price_low": 0.223,
+      "price_high": 0.374
+    },
+    "fills": 30,
+    "net_result": 1140.04
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 20,
+    "ts": "2026-01-01T00:00:04.300000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 25,
+    "detail": "bar 100 / 400 · 31 trades",
+    "bar_index": 99
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 21,
+    "ts": "2026-01-01T00:00:04.500000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 30,
+    "detail": "bar 120 / 400 · 36 trades",
+    "bar_index": 119
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 22,
+    "ts": "2026-01-01T00:00:04.700000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 35,
+    "detail": "bar 140 / 400 · 44 trades",
+    "bar_index": 139
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 23,
+    "ts": "2026-01-01T00:00:04.900000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 40,
+    "detail": "bar 160 / 400 · 48 trades",
+    "bar_index": 159
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 24,
+    "ts": "2026-01-01T00:00:05.100000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 45,
+    "detail": "bar 180 / 400 · 52 trades",
+    "bar_index": 179
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 25,
+    "ts": "2026-01-01T00:00:05.150000Z",
+    "type": "trade_cluster",
+    "region": {
+      "start_bar": 154,
+      "end_bar": 172,
+      "price_low": 0.264,
+      "price_high": 0.502
+    },
+    "fills": 34,
+    "net_result": 370.8
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 26,
+    "ts": "2026-01-01T00:00:05.350000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 50,
+    "detail": "bar 200 / 400 · 56 trades",
+    "bar_index": 199
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 27,
+    "ts": "2026-01-01T00:00:05.550000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 55,
+    "detail": "bar 220 / 400 · 62 trades",
+    "bar_index": 219
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 28,
+    "ts": "2026-01-01T00:00:05.750000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 60,
+    "detail": "bar 240 / 400 · 67 trades",
+    "bar_index": 239
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 29,
+    "ts": "2026-01-01T00:00:05.950000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 65,
+    "detail": "bar 260 / 400 · 75 trades",
+    "bar_index": 259
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 30,
+    "ts": "2026-01-01T00:00:06.150000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 70,
+    "detail": "bar 280 / 400 · 82 trades",
+    "bar_index": 279
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 31,
+    "ts": "2026-01-01T00:00:06.350000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 75,
+    "detail": "bar 300 / 400 · 87 trades",
+    "bar_index": 299
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 32,
+    "ts": "2026-01-01T00:00:06.550000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 80,
+    "detail": "bar 320 / 400 · 91 trades",
+    "bar_index": 319
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 33,
+    "ts": "2026-01-01T00:00:06.600000Z",
+    "type": "trade_cluster",
+    "region": {
+      "start_bar": 283,
+      "end_bar": 300,
+      "price_low": 0.492,
+      "price_high": 0.664
+    },
+    "fills": 28,
+    "net_result": -452.03
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 34,
+    "ts": "2026-01-01T00:00:06.800000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 85,
+    "detail": "bar 340 / 400 · 98 trades",
+    "bar_index": 339
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 35,
+    "ts": "2026-01-01T00:00:07Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 90,
+    "detail": "bar 360 / 400 · 104 trades",
+    "bar_index": 359
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 36,
+    "ts": "2026-01-01T00:00:07.200000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 95,
+    "detail": "bar 380 / 400 · 108 trades",
+    "bar_index": 379
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 37,
+    "ts": "2026-01-01T00:00:07.400000Z",
+    "type": "stage_progress",
+    "stage": "SIMULATOR",
+    "progress": 100,
+    "detail": "bar 400 / 400 · 112 trades",
+    "bar_index": 399
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 38,
+    "ts": "2026-01-01T00:00:07.500000Z",
+    "type": "stage_done",
+    "stage": "SIMULATOR",
+    "detail": "400 bars · 118 trades"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 39,
+    "ts": "2026-01-01T00:00:07.650000Z",
+    "type": "stage_started",
+    "stage": "COSTS"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 40,
+    "ts": "2026-01-01T00:00:07.983333Z",
+    "type": "stage_progress",
+    "stage": "COSTS",
+    "progress": 33,
+    "detail": "fees",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 41,
+    "ts": "2026-01-01T00:00:08.316667Z",
+    "type": "stage_progress",
+    "stage": "COSTS",
+    "progress": 67,
+    "detail": "slippage",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 42,
+    "ts": "2026-01-01T00:00:08.650000Z",
+    "type": "stage_progress",
+    "stage": "COSTS",
+    "progress": 100,
+    "detail": "236 fills",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 43,
+    "ts": "2026-01-01T00:00:08.750000Z",
+    "type": "stage_done",
+    "stage": "COSTS",
+    "detail": "236 fills costed"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 44,
+    "ts": "2026-01-01T00:00:08.900000Z",
+    "type": "stage_started",
+    "stage": "AUDITOR"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 45,
+    "ts": "2026-01-01T00:00:09.200000Z",
+    "type": "stage_progress",
+    "stage": "AUDITOR",
+    "progress": 17,
+    "detail": "check 1 / 6",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 46,
+    "ts": "2026-01-01T00:00:09.250000Z",
+    "type": "check_done",
+    "check_id": "costs",
+    "status": "PASS",
+    "figure": "Fees and slippage on 236 of 236 fills"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 47,
+    "ts": "2026-01-01T00:00:09.550000Z",
+    "type": "stage_progress",
+    "stage": "AUDITOR",
+    "progress": 33,
+    "detail": "check 2 / 6",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 48,
+    "ts": "2026-01-01T00:00:09.600000Z",
+    "type": "check_done",
+    "check_id": "trade_count",
+    "status": "WARN",
+    "figure": "118 trades · 82 / 36 per split"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 49,
+    "ts": "2026-01-01T00:00:09.900000Z",
+    "type": "stage_progress",
+    "stage": "AUDITOR",
+    "progress": 50,
+    "detail": "check 3 / 6",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 50,
+    "ts": "2026-01-01T00:00:09.950000Z",
+    "type": "check_done",
+    "check_id": "without_best_trade",
+    "status": "PASS",
+    "figure": "PF 1.31 → 1.18 without best trade"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 51,
+    "ts": "2026-01-01T00:00:10.250000Z",
+    "type": "stage_progress",
+    "stage": "AUDITOR",
+    "progress": 67,
+    "detail": "check 4 / 6",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 52,
+    "ts": "2026-01-01T00:00:10.300000Z",
+    "type": "check_done",
+    "check_id": "out_of_sample",
+    "status": "WARN",
+    "figure": "Out-of-sample PF 1.04 on last 30%"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 53,
+    "ts": "2026-01-01T00:00:10.600000Z",
+    "type": "stage_progress",
+    "stage": "AUDITOR",
+    "progress": 83,
+    "detail": "check 5 / 6",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 54,
+    "ts": "2026-01-01T00:00:10.650000Z",
+    "type": "check_done",
+    "check_id": "versus_random",
+    "status": "PASS",
+    "figure": "97th percentile of 1,000 random runs"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 55,
+    "ts": "2026-01-01T00:00:10.950000Z",
+    "type": "stage_progress",
+    "stage": "AUDITOR",
+    "progress": 100,
+    "detail": "check 6 / 6",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 56,
+    "ts": "2026-01-01T00:00:11Z",
+    "type": "check_done",
+    "check_id": "robustness",
+    "status": "FAIL",
+    "figure": "One quarter holds 64% of profit"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 57,
+    "ts": "2026-01-01T00:00:11.100000Z",
+    "type": "stage_done",
+    "stage": "AUDITOR",
+    "detail": "6 checks · 1 failed"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 58,
+    "ts": "2026-01-01T00:00:11.250000Z",
+    "type": "stage_started",
+    "stage": "REPORTER"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 59,
+    "ts": "2026-01-01T00:00:11.550000Z",
+    "type": "stage_progress",
+    "stage": "REPORTER",
+    "progress": 33,
+    "detail": "equity curve",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 60,
+    "ts": "2026-01-01T00:00:11.850000Z",
+    "type": "stage_progress",
+    "stage": "REPORTER",
+    "progress": 67,
+    "detail": "calendar",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 61,
+    "ts": "2026-01-01T00:00:12.150000Z",
+    "type": "stage_progress",
+    "stage": "REPORTER",
+    "progress": 100,
+    "detail": "report",
+    "bar_index": null
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 62,
+    "ts": "2026-01-01T00:00:12.250000Z",
+    "type": "stage_done",
+    "stage": "REPORTER",
+    "detail": "report ready"
+  },
+  {
+    "schema_version": 1,
+    "run_id": "sample-run",
+    "seq": 63,
+    "ts": "2026-01-01T00:00:12.650000Z",
+    "type": "run_done",
+    "verdict": "FRAGILE"
+  }
+]

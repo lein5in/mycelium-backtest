@@ -1,0 +1,87 @@
+@import './fonts.css';
+@import './tokens.css';
+@import 'tailwindcss';
+
+@theme inline {
+  --color-*: initial;
+  --color-app: var(--bg-app);
+  --color-panel: var(--bg-panel);
+  --color-panel-head: var(--bg-panel-head);
+  --color-hover: var(--bg-hover);
+  --color-landing: var(--bg-landing);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-grid: var(--grid);
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-ink-3: var(--text-3);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-violet: var(--violet);
+  --color-violet-text: var(--violet-text);
+  --color-cyan: var(--cyan);
+  --color-magenta: var(--magenta);
+  --color-profit: var(--profit);
+  --color-profit-text: var(--profit-text);
+  --color-loss: var(--loss);
+  --color-loss-text: var(--loss-text);
+  --color-warn: var(--warn);
+  --color-warn-text: var(--warn-text);
+  --color-transparent: transparent;
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --text-data: 12.5px;
+  --text-label: 11px;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg-app);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+    }
+  }
+}
+
+@utility label-caps {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@utility sr-only-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
