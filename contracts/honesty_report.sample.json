@@ -1,0 +1,1601 @@
+{
+  "schema_version": 1,
+  "run": {
+    "strategy_id": "donchian_breakout",
+    "strategy_name": "Donchian Channel Breakout",
+    "parameters": {
+      "entry_lookback": 12,
+      "stop_atr": 2.0,
+      "exit_lookback": 6,
+      "max_bars": 0,
+      "directions": "both"
+    },
+    "market": "crypto_24x7",
+    "timeframe": "1h",
+    "first_bar": "2025-11-20T00:00:00Z",
+    "last_bar": "2026-01-21T11:00:00Z",
+    "bar_count": 1500,
+    "trade_count": 57
+  },
+  "checks": [
+    {
+      "id": "costs",
+      "status": "FAIL",
+      "headline": "Loses money even before costs",
+      "detail": "Gross P&L before costs -249.91; fees 1,141.25 and slippage 228.25 leave a net of -1,619.41. Re-run with costs at 2x: net -2,950.51. Re-run with no costs: net -240.87.",
+      "insufficient_data": false,
+      "measured": {
+        "trade_count": 57,
+        "gross_pnl": -249.9063127970244,
+        "fees": 1141.2522847905682,
+        "slippage_cost": 228.25044696186114,
+        "total_costs": 1369.5027317524293,
+        "net_pnl": -1619.4090445494564,
+        "net_pnl_zero_cost": -240.86631665186792,
+        "net_pnl_scaled_cost": -2950.5132501336807,
+        "cost_multiplier": 2.0,
+        "cost_share_of_gross": null
+      },
+      "thresholds": {
+        "pass_max_share": 0.5,
+        "fail_min_share": 0.8,
+        "cost_multiplier": 2.0
+      }
+    },
+    {
+      "id": "trade_count",
+      "status": "WARN",
+      "headline": "Only 57 trades: results can move a lot with a few trades",
+      "detail": "57 trades in total (100 or more passes, fewer than 30 fails). The chronological split gives 39 trades in the first 70% and 18 in the last 30%. At least 30 per part are needed, so the split results are flagged as insufficient.",
+      "insufficient_data": true,
+      "measured": {
+        "trade_count": 57,
+        "first_part_trades": 39,
+        "last_part_trades": 18
+      },
+      "thresholds": {
+        "pass_min_trades": 100,
+        "warn_min_trades": 30,
+        "min_trades_per_split": 30,
+        "split_fraction": 0.7
+      }
+    },
+    {
+      "id": "without_best_trade",
+      "status": "FAIL",
+      "headline": "Without the best trade the result is -2,233.60",
+      "detail": "The best trade made 614.19. Without it the net P&L is -2,233.60 and the profit factor 0.60 (n/a means no losing trade).",
+      "insufficient_data": false,
+      "measured": {
+        "trade_count": 57,
+        "best_trade_pnl": 614.1883447422665,
+        "net_pnl": -1619.4090445494567,
+        "profit_factor": 0.7083250136196203,
+        "net_pnl_without_best": -2233.597389291723,
+        "profit_factor_without_best": 0.5977023283316493,
+        "best_trade_share_of_net": null
+      },
+      "thresholds": {
+        "min_profit_factor": 1.1,
+        "max_best_share": 0.4,
+        "min_trades": 30
+      }
+    },
+    {
+      "id": "out_of_sample",
+      "status": "WARN",
+      "headline": "The last 30% of trades hold up: net 181.76",
+      "detail": "First 70% of trades (39): net -1,801.17, profit factor 0.56. Last 30% (18): net 181.76, profit factor 1.13. The split is by trade order, not by date, and the strategy rules are the same in both parts. Each part needs at least 30 trades; this split is insufficient to judge.",
+      "insufficient_data": true,
+      "measured": {
+        "first_trades": 39,
+        "first_net_pnl": -1801.1662504531596,
+        "first_profit_factor": 0.5608747894335814,
+        "first_win_rate_pct": 38.46153846153847,
+        "first_expectancy": -46.18375001161947,
+        "last_trades": 18,
+        "last_net_pnl": 181.75720590370247,
+        "last_profit_factor": 1.12531637717556,
+        "last_win_rate_pct": 38.88888888888889,
+        "last_expectancy": 10.097622550205692,
+        "profit_factor_ratio": 2.006359348602563
+      },
+      "thresholds": {
+        "split_fraction": 0.7,
+        "min_profit_factor_ratio": 0.7,
+        "min_trades_per_split": 30
+      }
+    },
+    {
+      "id": "versus_random",
+      "status": "FAIL",
+      "headline": "Beats only 44% of random-entry runs",
+      "detail": "200 draws, each with 57 trades that keep the real holding durations but enter at random bars, long or short at random, with the same costs and position size. The real net P&L -1,619.41 beats 44.5% of the draws (median -1,494.21, 5th to 95th percentile -3,847.47 to 1,008.26). This measures how often random timing did as well on this data; it does not show that the strategy will keep working, and a high percentile can still be luck.",
+      "insufficient_data": false,
+      "measured": {
+        "trade_count": 57,
+        "real_net_pnl": -1619.4090445494564,
+        "percentile": 44.5,
+        "random_mean": -1439.9299812579734,
+        "random_median": -1494.2144154726664,
+        "random_p5": -3847.473677094005,
+        "random_p95": 1008.259227659711,
+        "unplaced_trades": 0
+      },
+      "thresholds": {
+        "pass_min_percentile": 95.0,
+        "warn_min_percentile": 80.0,
+        "min_trades": 30,
+        "draws": 200
+      }
+    },
+    {
+      "id": "robustness",
+      "status": "FAIL",
+      "headline": "No overall profit to spread across periods",
+      "detail": "Trades cut into 4 equal blocks by trade count, in time order; net P&L per block: -1,540.88, -1,301.79, 856.60, 366.66. Positive blocks: 50%. The total is not positive, so there is no profit to spread. Parameter sweep: 25 of 25 settings of entry_lookback and stop_atr run; 8 of 8 neighbours of the chosen setting evaluated, 0% of them profitable. Best setting in the grid: -677.57.",
+      "insufficient_data": false,
+      "measured": {
+        "period_status": "FAIL",
+        "period_blocks": 4,
+        "period_max_share": null,
+        "period_positive_fraction": 0.5,
+        "parameter_status": "FAIL"
+      },
+      "thresholds": {
+        "period_blocks": 4,
+        "period_fail_share": 0.8,
+        "period_warn_share": 0.5,
+        "period_min_positive_fraction": 0.5,
+        "sweep_pass_neighbours": 0.7,
+        "sweep_warn_neighbours": 0.4,
+        "sweep_spike_ratio": 0.5
+      }
+    }
+  ],
+  "verdict": {
+    "id": "NOT_CREDIBLE",
+    "label": "Not credible",
+    "rule": "costs_fail",
+    "sentence": "Not credible if the costs, random-entry or trade-count check fails, or if two or more checks fail. Credible only if no check fails, at most one warns, the random-entry check passes and no check lacks data. Fragile otherwise.",
+    "rules": [
+      {
+        "id": "costs_fail",
+        "verdict": "NOT_CREDIBLE",
+        "description": "The costs check fails.",
+        "matched": true
+      },
+      {
+        "id": "random_fail",
+        "verdict": "NOT_CREDIBLE",
+        "description": "The comparison with random entries fails.",
+        "matched": true
+      },
+      {
+        "id": "trade_count_fail",
+        "verdict": "NOT_CREDIBLE",
+        "description": "The trade-count check fails.",
+        "matched": false
+      },
+      {
+        "id": "two_fails",
+        "verdict": "NOT_CREDIBLE",
+        "description": "Two or more checks fail.",
+        "matched": true
+      },
+      {
+        "id": "credible",
+        "verdict": "CREDIBLE",
+        "description": "No check fails, at most one warns, the random-entry check passes and no check lacks data.",
+        "matched": false
+      },
+      {
+        "id": "otherwise",
+        "verdict": "FRAGILE",
+        "description": "Any other combination.",
+        "matched": true
+      }
+    ]
+  },
+  "config": {
+    "cost_multiplier": 2.0,
+    "costs_pass_share": 0.5,
+    "costs_fail_share": 0.8,
+    "trade_count_pass": 100,
+    "trade_count_warn": 30,
+    "split_fraction": 0.7,
+    "min_trades_per_split": 30,
+    "min_trades": 30,
+    "best_trade_min_profit_factor": 1.1,
+    "best_trade_max_share": 0.4,
+    "out_of_sample_min_pf_ratio": 0.7,
+    "period_blocks": 4,
+    "period_min_trades_per_block": 10,
+    "period_fail_share": 0.8,
+    "period_warn_share": 0.5,
+    "period_min_positive_fraction": 0.5,
+    "random_seed": 1,
+    "random_draws": 200,
+    "random_bins": 40,
+    "random_pass_percentile": 95.0,
+    "random_warn_percentile": 80.0,
+    "sweep_values_per_parameter": 5,
+    "sweep_relative_spacing": 0.1,
+    "sweep_max_combinations": 400,
+    "sweep_time_budget_seconds": 60.0,
+    "sweep_pass_neighbours": 0.7,
+    "sweep_warn_neighbours": 0.4,
+    "sweep_spike_ratio": 0.5
+  },
+  "random_entries": {
+    "draws": 200,
+    "seed": 1,
+    "trades_per_draw": 57,
+    "eligible_entry_bars": 1485,
+    "real_net_pnl": -1619.4090445494564,
+    "percentile": 44.5,
+    "mean": -1439.9299812579734,
+    "median": -1494.2144154726664,
+    "p5": -3847.473677094005,
+    "p95": 1008.259227659711,
+    "histogram": {
+      "edges": [
+        -5429.659006758764,
+        -5223.4963733906825,
+        -5017.333740022602,
+        -4811.171106654521,
+        -4605.00847328644,
+        -4398.845839918358,
+        -4192.683206550278,
+        -3986.5205731821966,
+        -3780.3579398141155,
+        -3574.1953064460345,
+        -3368.0326730779534,
+        -3161.8700397098723,
+        -2955.7074063417913,
+        -2749.54477297371,
+        -2543.382139605629,
+        -2337.219506237548,
+        -2131.056872869467,
+        -1924.894239501386,
+        -1718.731606133305,
+        -1512.5689727652239,
+        -1306.4063393971428,
+        -1100.2437060290613,
+        -894.0810726609807,
+        -687.9184392929001,
+        -481.75580592481856,
+        -275.59317255673704,
+        -69.43053918865644,
+        136.73209417942417,
+        342.8947275475057,
+        549.0573609155872,
+        755.2199942836678,
+        961.3826276517484,
+        1167.54526101983,
+        1373.7078943879114,
+        1579.870527755992,
+        1786.0331611240726,
+        1992.1957944921542,
+        2198.3584278602357,
+        2404.5210612283163,
+        2610.683694596397,
+        2816.846327964479
+      ],
+      "counts": [
+        1,
+        0,
+        2,
+        2,
+        2,
+        1,
+        1,
+        3,
+        5,
+        3,
+        3,
+        7,
+        5,
+        6,
+        5,
+        11,
+        8,
+        17,
+        18,
+        10,
+        15,
+        14,
+        9,
+        8,
+        4,
+        6,
+        6,
+        3,
+        5,
+        6,
+        3,
+        2,
+        2,
+        1,
+        2,
+        0,
+        1,
+        0,
+        1,
+        2
+      ],
+      "real_value": -1619.4090445494564,
+      "real_bin": 18
+    }
+  },
+  "robustness": {
+    "period": {
+      "status": "FAIL",
+      "insufficient_data": false,
+      "blocks": [
+        {
+          "index": 0,
+          "first_trade": 0,
+          "last_trade": 14,
+          "trade_count": 15,
+          "start": "2025-11-20T21:00:00Z",
+          "end": "2025-12-06T05:00:00Z",
+          "net_pnl": -1540.879905315218,
+          "share_of_profit": null
+        },
+        {
+          "index": 1,
+          "first_trade": 15,
+          "last_trade": 28,
+          "trade_count": 14,
+          "start": "2025-12-06T15:00:00Z",
+          "end": "2025-12-19T15:00:00Z",
+          "net_pnl": -1301.7863890185058,
+          "share_of_profit": null
+        },
+        {
+          "index": 2,
+          "first_trade": 29,
+          "last_trade": 42,
+          "trade_count": 14,
+          "start": "2025-12-20T21:00:00Z",
+          "end": "2026-01-04T13:00:00Z",
+          "net_pnl": 856.6016172368169,
+          "share_of_profit": null
+        },
+        {
+          "index": 3,
+          "first_trade": 43,
+          "last_trade": 56,
+          "trade_count": 14,
+          "start": "2026-01-05T19:00:00Z",
+          "end": "2026-01-21T04:00:00Z",
+          "net_pnl": 366.65563254745,
+          "share_of_profit": null
+        }
+      ],
+      "max_share": null,
+      "positive_fraction": 0.5,
+      "total_net_pnl": -1619.4090445494564
+    },
+    "parameters": {
+      "status": "FAIL",
+      "insufficient_data": false,
+      "reason": "25 of 25 settings of entry_lookback and stop_atr run; 8 of 8 neighbours of the chosen setting evaluated, 0% of them profitable. Best setting in the grid: -677.57."
+    }
+  },
+  "sweep": {
+    "axes": [
+      {
+        "name": "entry_lookback",
+        "label": "Entry channel",
+        "values": [
+          10.0,
+          11.0,
+          12.0,
+          13.0,
+          14.0
+        ],
+        "chosen": 12.0
+      },
+      {
+        "name": "stop_atr",
+        "label": "Stop distance",
+        "values": [
+          1.5,
+          1.75,
+          2.0,
+          2.25,
+          2.5
+        ],
+        "chosen": 2.0
+      }
+    ],
+    "cells": [
+      {
+        "coordinates": [
+          0,
+          0
+        ],
+        "values": {
+          "entry_lookback": 10.0,
+          "stop_atr": 1.5
+        },
+        "state": "ok",
+        "net_pnl": -758.9508705493823,
+        "profit_factor": 0.8437672712418646,
+        "trade_count": 59,
+        "message": null
+      },
+      {
+        "coordinates": [
+          0,
+          1
+        ],
+        "values": {
+          "entry_lookback": 10.0,
+          "stop_atr": 1.75
+        },
+        "state": "ok",
+        "net_pnl": -677.5693774648151,
+        "profit_factor": 0.8681202398980649,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          0,
+          2
+        ],
+        "values": {
+          "entry_lookback": 10.0,
+          "stop_atr": 2.0
+        },
+        "state": "ok",
+        "net_pnl": -956.7956113540425,
+        "profit_factor": 0.8236855655701854,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          0,
+          3
+        ],
+        "values": {
+          "entry_lookback": 10.0,
+          "stop_atr": 2.25
+        },
+        "state": "ok",
+        "net_pnl": -1021.3968531252752,
+        "profit_factor": 0.8139953931011956,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          0,
+          4
+        ],
+        "values": {
+          "entry_lookback": 10.0,
+          "stop_atr": 2.5
+        },
+        "state": "ok",
+        "net_pnl": -1070.6217026824872,
+        "profit_factor": 0.8067633708328944,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          1,
+          0
+        ],
+        "values": {
+          "entry_lookback": 11.0,
+          "stop_atr": 1.5
+        },
+        "state": "ok",
+        "net_pnl": -709.4990754778418,
+        "profit_factor": 0.8499898467168223,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          1,
+          1
+        ],
+        "values": {
+          "entry_lookback": 11.0,
+          "stop_atr": 1.75
+        },
+        "state": "ok",
+        "net_pnl": -1138.0930879735904,
+        "profit_factor": 0.77936525337018,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          1,
+          2
+        ],
+        "values": {
+          "entry_lookback": 11.0,
+          "stop_atr": 2.0
+        },
+        "state": "ok",
+        "net_pnl": -1486.0618787491505,
+        "profit_factor": 0.7301129582620338,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          1,
+          3
+        ],
+        "values": {
+          "entry_lookback": 11.0,
+          "stop_atr": 2.25
+        },
+        "state": "ok",
+        "net_pnl": -1573.831788646822,
+        "profit_factor": 0.7186574925504631,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          1,
+          4
+        ],
+        "values": {
+          "entry_lookback": 11.0,
+          "stop_atr": 2.5
+        },
+        "state": "ok",
+        "net_pnl": -1627.275519639246,
+        "profit_factor": 0.711856593599028,
+        "trade_count": 58,
+        "message": null
+      },
+      {
+        "coordinates": [
+          2,
+          0
+        ],
+        "values": {
+          "entry_lookback": 12.0,
+          "stop_atr": 1.5
+        },
+        "state": "ok",
+        "net_pnl": -1032.300866062449,
+        "profit_factor": 0.7851841635765332,
+        "trade_count": 57,
+        "message": null
+      },
+      {
+        "coordinates": [
+          2,
+          1
+        ],
+        "values": {
+          "entry_lookback": 12.0,
+          "stop_atr": 1.75
+        },
+        "state": "ok",
+        "net_pnl": -1474.5412769082086,
+        "profit_factor": 0.7190148976337369,
+        "trade_count": 57,
+        "message": null
+      },
+      {
+        "coordinates": [
+          2,
+          2
+        ],
+        "values": {
+          "entry_lookback": 12.0,
+          "stop_atr": 2.0
+        },
+        "state": "ok",
+        "net_pnl": -1619.4090445494567,
+        "profit_factor": 0.7083250136196203,
+        "trade_count": 57,
+        "message": null
+      },
+      {
+        "coordinates": [
+          2,
+          3
+        ],
+        "values": {
+          "entry_lookback": 12.0,
+          "stop_atr": 2.25
+        },
+        "state": "ok",
+        "net_pnl": -1704.2426941770145,
+        "profit_factor": 0.6976650011245839,
+        "trade_count": 57,
+        "message": null
+      },
+      {
+        "coordinates": [
+          2,
+          4
+        ],
+        "values": {
+          "entry_lookback": 12.0,
+          "stop_atr": 2.5
+        },
+        "state": "ok",
+        "net_pnl": -1801.7252960614128,
+        "profit_factor": 0.6858049996474787,
+        "trade_count": 57,
+        "message": null
+      },
+      {
+        "coordinates": [
+          3,
+          0
+        ],
+        "values": {
+          "entry_lookback": 13.0,
+          "stop_atr": 1.5
+        },
+        "state": "ok",
+        "net_pnl": -922.0373041292754,
+        "profit_factor": 0.8036234722294963,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          3,
+          1
+        ],
+        "values": {
+          "entry_lookback": 13.0,
+          "stop_atr": 1.75
+        },
+        "state": "ok",
+        "net_pnl": -1304.8907180843476,
+        "profit_factor": 0.7430359186394601,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          3,
+          2
+        ],
+        "values": {
+          "entry_lookback": 13.0,
+          "stop_atr": 2.0
+        },
+        "state": "ok",
+        "net_pnl": -1462.406602481607,
+        "profit_factor": 0.7289379368890504,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          3,
+          3
+        ],
+        "values": {
+          "entry_lookback": 13.0,
+          "stop_atr": 2.25
+        },
+        "state": "ok",
+        "net_pnl": -1545.6861030437956,
+        "profit_factor": 0.7178569957127294,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          3,
+          4
+        ],
+        "values": {
+          "entry_lookback": 13.0,
+          "stop_atr": 2.5
+        },
+        "state": "ok",
+        "net_pnl": -1666.358681301227,
+        "profit_factor": 0.7023855065483071,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          4,
+          0
+        ],
+        "values": {
+          "entry_lookback": 14.0,
+          "stop_atr": 1.5
+        },
+        "state": "ok",
+        "net_pnl": -921.2494365266479,
+        "profit_factor": 0.8037583436157347,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          4,
+          1
+        ],
+        "values": {
+          "entry_lookback": 14.0,
+          "stop_atr": 1.75
+        },
+        "state": "ok",
+        "net_pnl": -1346.2990320076938,
+        "profit_factor": 0.737025999413099,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          4,
+          2
+        ],
+        "values": {
+          "entry_lookback": 14.0,
+          "stop_atr": 2.0
+        },
+        "state": "ok",
+        "net_pnl": -1530.356577869883,
+        "profit_factor": 0.7198713300900853,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          4,
+          3
+        ],
+        "values": {
+          "entry_lookback": 14.0,
+          "stop_atr": 2.25
+        },
+        "state": "ok",
+        "net_pnl": -1592.4556231806223,
+        "profit_factor": 0.7117804474453973,
+        "trade_count": 56,
+        "message": null
+      },
+      {
+        "coordinates": [
+          4,
+          4
+        ],
+        "values": {
+          "entry_lookback": 14.0,
+          "stop_atr": 2.5
+        },
+        "state": "ok",
+        "net_pnl": -1511.3954518079922,
+        "profit_factor": 0.722378558481697,
+        "trade_count": 55,
+        "message": null
+      }
+    ],
+    "chosen": [
+      2,
+      2
+    ],
+    "best": [
+      0,
+      1
+    ],
+    "combinations": 25,
+    "completed": 25,
+    "stopped_by_budget": false,
+    "elapsed_seconds": 0.0,
+    "neighbour_count": 8,
+    "profitable_neighbour_fraction": 0.0,
+    "neighbour_median_share": null,
+    "chosen_is_spike": false,
+    "best_is_spike": false
+  },
+  "calendar": {
+    "rule": "Each trade counts on the session date of its exit bar, in the market's session time zone (New York for US stocks; the configured anchor and time zone for crypto). Days without a session, and session days outside the data, are left empty, not zero.",
+    "timezone": "UTC",
+    "months": [
+      {
+        "month": "2025-11",
+        "weeks": [
+          {
+            "monday": "2025-10-27",
+            "days": [
+              {
+                "date": "2025-10-27",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-10-28",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-10-29",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-10-30",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-10-31",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-01",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-02",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              }
+            ],
+            "net_pnl": 0.0,
+            "trades": 0
+          },
+          {
+            "monday": "2025-11-03",
+            "days": [
+              {
+                "date": "2025-11-03",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-04",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-05",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-06",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-07",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-08",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-09",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              }
+            ],
+            "net_pnl": 0.0,
+            "trades": 0
+          },
+          {
+            "monday": "2025-11-10",
+            "days": [
+              {
+                "date": "2025-11-10",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-11",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-12",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-13",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-14",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-15",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-16",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              }
+            ],
+            "net_pnl": 0.0,
+            "trades": 0
+          },
+          {
+            "monday": "2025-11-17",
+            "days": [
+              {
+                "date": "2025-11-17",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-18",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-19",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-11-20",
+                "kind": "session",
+                "net_pnl": -177.83721228547074,
+                "trades": 1
+              },
+              {
+                "date": "2025-11-21",
+                "kind": "session",
+                "net_pnl": 72.81057184927624,
+                "trades": 1
+              },
+              {
+                "date": "2025-11-22",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2025-11-23",
+                "kind": "session",
+                "net_pnl": 25.942857445080584,
+                "trades": 1
+              }
+            ],
+            "net_pnl": -79.0837829911139,
+            "trades": 3
+          },
+          {
+            "monday": "2025-11-24",
+            "days": [
+              {
+                "date": "2025-11-24",
+                "kind": "session",
+                "net_pnl": -181.1698873116076,
+                "trades": 1
+              },
+              {
+                "date": "2025-11-25",
+                "kind": "session",
+                "net_pnl": -211.8189298912902,
+                "trades": 1
+              },
+              {
+                "date": "2025-11-26",
+                "kind": "session",
+                "net_pnl": -179.6050070389492,
+                "trades": 1
+              },
+              {
+                "date": "2025-11-27",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2025-11-28",
+                "kind": "session",
+                "net_pnl": -107.29719372187205,
+                "trades": 2
+              },
+              {
+                "date": "2025-11-29",
+                "kind": "session",
+                "net_pnl": -184.9355586033029,
+                "trades": 1
+              },
+              {
+                "date": "2025-11-30",
+                "kind": "session",
+                "net_pnl": -181.26430376834733,
+                "trades": 1
+              }
+            ],
+            "net_pnl": -1046.0908803353693,
+            "trades": 7
+          }
+        ],
+        "net_pnl": -1125.1746633264831,
+        "trades": 10,
+        "green_weeks": 0,
+        "weeks_with_trades": 2,
+        "best_day": "2025-11-21",
+        "best_day_pnl": 72.81057184927624,
+        "worst_day": "2025-11-25",
+        "worst_day_pnl": -211.8189298912902
+      },
+      {
+        "month": "2025-12",
+        "weeks": [
+          {
+            "monday": "2025-12-01",
+            "days": [
+              {
+                "date": "2025-12-01",
+                "kind": "session",
+                "net_pnl": -136.07157014397467,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-02",
+                "kind": "session",
+                "net_pnl": -190.7686122860033,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-03",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2025-12-04",
+                "kind": "session",
+                "net_pnl": -47.470526835037504,
+                "trades": 2
+              },
+              {
+                "date": "2025-12-05",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2025-12-06",
+                "kind": "session",
+                "net_pnl": -193.5514575756967,
+                "trades": 2
+              },
+              {
+                "date": "2025-12-07",
+                "kind": "session",
+                "net_pnl": -72.28777568997201,
+                "trades": 1
+              }
+            ],
+            "net_pnl": -640.1499425306841,
+            "trades": 7
+          },
+          {
+            "monday": "2025-12-08",
+            "days": [
+              {
+                "date": "2025-12-08",
+                "kind": "session",
+                "net_pnl": -186.05591309415215,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-09",
+                "kind": "session",
+                "net_pnl": -187.78065287430348,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-10",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2025-12-11",
+                "kind": "session",
+                "net_pnl": -149.5648655046801,
+                "trades": 2
+              },
+              {
+                "date": "2025-12-12",
+                "kind": "session",
+                "net_pnl": -194.93950053270794,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-13",
+                "kind": "session",
+                "net_pnl": -122.44181174695595,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-14",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              }
+            ],
+            "net_pnl": -840.7827437527997,
+            "trades": 6
+          },
+          {
+            "monday": "2025-12-15",
+            "days": [
+              {
+                "date": "2025-12-15",
+                "kind": "session",
+                "net_pnl": 153.91254882964975,
+                "trades": 2
+              },
+              {
+                "date": "2025-12-16",
+                "kind": "session",
+                "net_pnl": -178.8234550341376,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-17",
+                "kind": "session",
+                "net_pnl": -216.47244390906337,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-18",
+                "kind": "session",
+                "net_pnl": -148.70878381346088,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-19",
+                "kind": "session",
+                "net_pnl": 153.53318920325563,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-20",
+                "kind": "session",
+                "net_pnl": 79.79009613193116,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-21",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              }
+            ],
+            "net_pnl": -156.7688485918253,
+            "trades": 7
+          },
+          {
+            "monday": "2025-12-22",
+            "days": [
+              {
+                "date": "2025-12-22",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2025-12-23",
+                "kind": "session",
+                "net_pnl": 336.46635096149,
+                "trades": 2
+              },
+              {
+                "date": "2025-12-24",
+                "kind": "session",
+                "net_pnl": -214.92022571637725,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-25",
+                "kind": "session",
+                "net_pnl": 200.84122535573692,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-26",
+                "kind": "session",
+                "net_pnl": 20.238123315798234,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-27",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2025-12-28",
+                "kind": "session",
+                "net_pnl": 156.10591957377864,
+                "trades": 1
+              }
+            ],
+            "net_pnl": 498.7313934904265,
+            "trades": 6
+          },
+          {
+            "monday": "2025-12-29",
+            "days": [
+              {
+                "date": "2025-12-29",
+                "kind": "session",
+                "net_pnl": 309.2853883217995,
+                "trades": 1
+              },
+              {
+                "date": "2025-12-30",
+                "kind": "session",
+                "net_pnl": 153.6931659364072,
+                "trades": 2
+              },
+              {
+                "date": "2025-12-31",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2026-01-01",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-02",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-03",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-04",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              }
+            ],
+            "net_pnl": 462.9785542582067,
+            "trades": 3
+          }
+        ],
+        "net_pnl": -675.9915871266759,
+        "trades": 29,
+        "green_weeks": 2,
+        "weeks_with_trades": 5,
+        "best_day": "2025-12-23",
+        "best_day_pnl": 336.46635096149,
+        "worst_day": "2025-12-17",
+        "worst_day_pnl": -216.47244390906337
+      },
+      {
+        "month": "2026-01",
+        "weeks": [
+          {
+            "monday": "2025-12-29",
+            "days": [
+              {
+                "date": "2025-12-29",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-12-30",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2025-12-31",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-01",
+                "kind": "session",
+                "net_pnl": 205.63721204474277,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-02",
+                "kind": "session",
+                "net_pnl": -130.96299091295901,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-03",
+                "kind": "session",
+                "net_pnl": -162.50577317812875,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-04",
+                "kind": "session",
+                "net_pnl": -97.06687459740246,
+                "trades": 1
+              }
+            ],
+            "net_pnl": -184.89842664374746,
+            "trades": 4
+          },
+          {
+            "monday": "2026-01-05",
+            "days": [
+              {
+                "date": "2026-01-05",
+                "kind": "session",
+                "net_pnl": -50.57814958355712,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-06",
+                "kind": "session",
+                "net_pnl": -199.02890820898347,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-07",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2026-01-08",
+                "kind": "session",
+                "net_pnl": -2.671041837240125,
+                "trades": 2
+              },
+              {
+                "date": "2026-01-09",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2026-01-10",
+                "kind": "session",
+                "net_pnl": 188.7897002638423,
+                "trades": 2
+              },
+              {
+                "date": "2026-01-11",
+                "kind": "session",
+                "net_pnl": 214.61529494446407,
+                "trades": 1
+              }
+            ],
+            "net_pnl": 151.12689557852565,
+            "trades": 7
+          },
+          {
+            "monday": "2026-01-12",
+            "days": [
+              {
+                "date": "2026-01-12",
+                "kind": "session",
+                "net_pnl": -183.3403116073531,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-13",
+                "kind": "session",
+                "net_pnl": -177.4540054898114,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-14",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2026-01-15",
+                "kind": "session",
+                "net_pnl": -15.871672003711836,
+                "trades": 2
+              },
+              {
+                "date": "2026-01-16",
+                "kind": "session",
+                "net_pnl": -35.075143377342215,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-17",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2026-01-18",
+                "kind": "session",
+                "net_pnl": 13.081524704876422,
+                "trades": 1
+              }
+            ],
+            "net_pnl": -398.65960777334215,
+            "trades": 6
+          },
+          {
+            "monday": "2026-01-19",
+            "days": [
+              {
+                "date": "2026-01-19",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2026-01-20",
+                "kind": "session",
+                "net_pnl": 0.0,
+                "trades": 0
+              },
+              {
+                "date": "2026-01-21",
+                "kind": "session",
+                "net_pnl": 614.1883447422665,
+                "trades": 1
+              },
+              {
+                "date": "2026-01-22",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-23",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-24",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-25",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              }
+            ],
+            "net_pnl": 614.1883447422665,
+            "trades": 1
+          },
+          {
+            "monday": "2026-01-26",
+            "days": [
+              {
+                "date": "2026-01-26",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-27",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-28",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-29",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-30",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-01-31",
+                "kind": "no_data",
+                "net_pnl": null,
+                "trades": null
+              },
+              {
+                "date": "2026-02-01",
+                "kind": "other_month",
+                "net_pnl": null,
+                "trades": null
+              }
+            ],
+            "net_pnl": 0.0,
+            "trades": 0
+          }
+        ],
+        "net_pnl": 181.75720590370256,
+        "trades": 18,
+        "green_weeks": 2,
+        "weeks_with_trades": 4,
+        "best_day": "2026-01-21",
+        "best_day_pnl": 614.1883447422665,
+        "worst_day": "2026-01-06",
+        "worst_day_pnl": -199.02890820898347
+      }
+    ]
+  },
+  "assumptions": [
+    "Past results do not predict future results. This report describes one backtest on one data set.",
+    "Costs are modelled from the fees and slippage you set; real fills can be worse.",
+    "The costs check re-runs the same rules with no costs and with costs at 2x.",
+    "The out-of-sample check splits trades in time order, 70/30; the rules were not re-fitted on the first part, so this is a consistency check, not a true walk-forward test.",
+    "Random entries: 200 draws with seed 1, the same number of trades and holding durations, random entry bars and directions, trades kept in their original order. Random trades have no stop or target, because those come from the signal logic being tested; they exit after the same number of bars as the real trade they mirror.",
+    "Random trades of one draw may overlap in time, unlike the real run, which holds one position at a time.",
+    "Random trades use the run's costs; with fixed-fraction sizing on the initial capital they use the same sizing rule, otherwise the notional of the real trade they mirror.",
+    "Period robustness cuts trades into up to 4 equal blocks by trade count, not by calendar time.",
+    "A check with fewer than 30 trades, or fewer than 30 per split, is flagged as lacking data and never passes.",
+    "The parameter sweep re-runs the full engine for each setting on the same data; a profitable neighbourhood is evidence of stability, not of future profit."
+  ]
+}

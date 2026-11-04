@@ -1,0 +1,1243 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mycelium-backtest/contracts/honesty_report.schema.json",
+  "title": "HonestyReport",
+  "x-schema-version": 1,
+  "$defs": {
+    "CalendarDay": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "session",
+            "closed",
+            "no_data",
+            "other_month"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "net_pnl": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Net Pnl"
+        },
+        "trades": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Trades"
+        }
+      },
+      "required": [
+        "date",
+        "kind",
+        "net_pnl",
+        "trades"
+      ],
+      "title": "CalendarDay",
+      "type": "object"
+    },
+    "CalendarMonth": {
+      "additionalProperties": false,
+      "properties": {
+        "month": {
+          "pattern": "^\\d{4}-\\d{2}$",
+          "title": "Month",
+          "type": "string"
+        },
+        "weeks": {
+          "items": {
+            "$ref": "#/$defs/CalendarWeek"
+          },
+          "title": "Weeks",
+          "type": "array"
+        },
+        "net_pnl": {
+          "title": "Net Pnl",
+          "type": "number"
+        },
+        "trades": {
+          "title": "Trades",
+          "type": "integer"
+        },
+        "green_weeks": {
+          "title": "Green Weeks",
+          "type": "integer"
+        },
+        "weeks_with_trades": {
+          "title": "Weeks With Trades",
+          "type": "integer"
+        },
+        "best_day": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Best Day"
+        },
+        "best_day_pnl": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Best Day Pnl"
+        },
+        "worst_day": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Worst Day"
+        },
+        "worst_day_pnl": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Worst Day Pnl"
+        }
+      },
+      "required": [
+        "month",
+        "weeks",
+        "net_pnl",
+        "trades",
+        "green_weeks",
+        "weeks_with_trades",
+        "best_day",
+        "best_day_pnl",
+        "worst_day",
+        "worst_day_pnl"
+      ],
+      "title": "CalendarMonth",
+      "type": "object"
+    },
+    "CalendarWeek": {
+      "additionalProperties": false,
+      "properties": {
+        "monday": {
+          "format": "date",
+          "title": "Monday",
+          "type": "string"
+        },
+        "days": {
+          "items": {
+            "$ref": "#/$defs/CalendarDay"
+          },
+          "title": "Days",
+          "type": "array"
+        },
+        "net_pnl": {
+          "title": "Net Pnl",
+          "type": "number"
+        },
+        "trades": {
+          "title": "Trades",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "monday",
+        "days",
+        "net_pnl",
+        "trades"
+      ],
+      "title": "CalendarWeek",
+      "type": "object"
+    },
+    "CheckResult": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "costs",
+            "trade_count",
+            "without_best_trade",
+            "out_of_sample",
+            "versus_random",
+            "robustness"
+          ],
+          "title": "Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "WARN",
+            "FAIL"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "headline": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Headline",
+          "type": "string"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        },
+        "insufficient_data": {
+          "title": "Insufficient Data",
+          "type": "boolean"
+        },
+        "measured": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Measured",
+          "type": "object"
+        },
+        "thresholds": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "title": "Thresholds",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "headline",
+        "detail",
+        "insufficient_data",
+        "measured",
+        "thresholds"
+      ],
+      "title": "CheckResult",
+      "type": "object"
+    },
+    "Histogram": {
+      "additionalProperties": false,
+      "properties": {
+        "edges": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Edges",
+          "type": "array"
+        },
+        "counts": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Counts",
+          "type": "array"
+        },
+        "real_value": {
+          "title": "Real Value",
+          "type": "number"
+        },
+        "real_bin": {
+          "title": "Real Bin",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "edges",
+        "counts",
+        "real_value",
+        "real_bin"
+      ],
+      "title": "Histogram",
+      "type": "object"
+    },
+    "HonestyConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "cost_multiplier": {
+          "default": 2.0,
+          "exclusiveMinimum": 1,
+          "maximum": 10,
+          "title": "Cost Multiplier",
+          "type": "number"
+        },
+        "costs_pass_share": {
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Costs Pass Share",
+          "type": "number"
+        },
+        "costs_fail_share": {
+          "default": 0.8,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Costs Fail Share",
+          "type": "number"
+        },
+        "trade_count_pass": {
+          "default": 100,
+          "maximum": 100000,
+          "minimum": 1,
+          "title": "Trade Count Pass",
+          "type": "integer"
+        },
+        "trade_count_warn": {
+          "default": 30,
+          "maximum": 100000,
+          "minimum": 1,
+          "title": "Trade Count Warn",
+          "type": "integer"
+        },
+        "split_fraction": {
+          "default": 0.7,
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Split Fraction",
+          "type": "number"
+        },
+        "min_trades_per_split": {
+          "default": 30,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Min Trades Per Split",
+          "type": "integer"
+        },
+        "min_trades": {
+          "default": 30,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Min Trades",
+          "type": "integer"
+        },
+        "best_trade_min_profit_factor": {
+          "default": 1.1,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Best Trade Min Profit Factor",
+          "type": "number"
+        },
+        "best_trade_max_share": {
+          "default": 0.4,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Best Trade Max Share",
+          "type": "number"
+        },
+        "out_of_sample_min_pf_ratio": {
+          "default": 0.7,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Out Of Sample Min Pf Ratio",
+          "type": "number"
+        },
+        "period_blocks": {
+          "default": 4,
+          "maximum": 20,
+          "minimum": 2,
+          "title": "Period Blocks",
+          "type": "integer"
+        },
+        "period_min_trades_per_block": {
+          "default": 10,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Period Min Trades Per Block",
+          "type": "integer"
+        },
+        "period_fail_share": {
+          "default": 0.8,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Period Fail Share",
+          "type": "number"
+        },
+        "period_warn_share": {
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Period Warn Share",
+          "type": "number"
+        },
+        "period_min_positive_fraction": {
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Period Min Positive Fraction",
+          "type": "number"
+        },
+        "random_seed": {
+          "default": 1,
+          "maximum": 4294967295,
+          "minimum": 0,
+          "title": "Random Seed",
+          "type": "integer"
+        },
+        "random_draws": {
+          "default": 1000,
+          "maximum": 5000,
+          "minimum": 100,
+          "title": "Random Draws",
+          "type": "integer"
+        },
+        "random_bins": {
+          "default": 40,
+          "maximum": 200,
+          "minimum": 10,
+          "title": "Random Bins",
+          "type": "integer"
+        },
+        "random_pass_percentile": {
+          "default": 95.0,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Random Pass Percentile",
+          "type": "number"
+        },
+        "random_warn_percentile": {
+          "default": 80.0,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Random Warn Percentile",
+          "type": "number"
+        },
+        "sweep_values_per_parameter": {
+          "default": 5,
+          "maximum": 20,
+          "minimum": 3,
+          "title": "Sweep Values Per Parameter",
+          "type": "integer"
+        },
+        "sweep_relative_spacing": {
+          "default": 0.1,
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Sweep Relative Spacing",
+          "type": "number"
+        },
+        "sweep_max_combinations": {
+          "default": 400,
+          "maximum": 400,
+          "minimum": 1,
+          "title": "Sweep Max Combinations",
+          "type": "integer"
+        },
+        "sweep_time_budget_seconds": {
+          "default": 60.0,
+          "exclusiveMinimum": 0,
+          "maximum": 600,
+          "title": "Sweep Time Budget Seconds",
+          "type": "number"
+        },
+        "sweep_pass_neighbours": {
+          "default": 0.7,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Sweep Pass Neighbours",
+          "type": "number"
+        },
+        "sweep_warn_neighbours": {
+          "default": 0.4,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Sweep Warn Neighbours",
+          "type": "number"
+        },
+        "sweep_spike_ratio": {
+          "default": 0.5,
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Sweep Spike Ratio",
+          "type": "number"
+        }
+      },
+      "title": "HonestyConfig",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "ParameterPart": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "PASS",
+            "WARN",
+            "FAIL",
+            "not_run"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "insufficient_data": {
+          "title": "Insufficient Data",
+          "type": "boolean"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "insufficient_data",
+        "reason"
+      ],
+      "title": "ParameterPart",
+      "type": "object"
+    },
+    "PeriodBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "title": "Index",
+          "type": "integer"
+        },
+        "first_trade": {
+          "title": "First Trade",
+          "type": "integer"
+        },
+        "last_trade": {
+          "title": "Last Trade",
+          "type": "integer"
+        },
+        "trade_count": {
+          "title": "Trade Count",
+          "type": "integer"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End"
+        },
+        "net_pnl": {
+          "title": "Net Pnl",
+          "type": "number"
+        },
+        "share_of_profit": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Share Of Profit"
+        }
+      },
+      "required": [
+        "index",
+        "first_trade",
+        "last_trade",
+        "trade_count",
+        "start",
+        "end",
+        "net_pnl",
+        "share_of_profit"
+      ],
+      "title": "PeriodBlock",
+      "type": "object"
+    },
+    "PeriodPart": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "PASS",
+            "WARN",
+            "FAIL"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "insufficient_data": {
+          "title": "Insufficient Data",
+          "type": "boolean"
+        },
+        "blocks": {
+          "items": {
+            "$ref": "#/$defs/PeriodBlock"
+          },
+          "title": "Blocks",
+          "type": "array"
+        },
+        "max_share": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Share"
+        },
+        "positive_fraction": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Positive Fraction"
+        },
+        "total_net_pnl": {
+          "title": "Total Net Pnl",
+          "type": "number"
+        }
+      },
+      "required": [
+        "status",
+        "insufficient_data",
+        "blocks",
+        "max_share",
+        "positive_fraction",
+        "total_net_pnl"
+      ],
+      "title": "PeriodPart",
+      "type": "object"
+    },
+    "PnlCalendar": {
+      "additionalProperties": false,
+      "properties": {
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        },
+        "months": {
+          "items": {
+            "$ref": "#/$defs/CalendarMonth"
+          },
+          "title": "Months",
+          "type": "array"
+        }
+      },
+      "required": [
+        "rule",
+        "timezone",
+        "months"
+      ],
+      "title": "PnlCalendar",
+      "type": "object"
+    },
+    "RandomEntries": {
+      "additionalProperties": false,
+      "properties": {
+        "draws": {
+          "title": "Draws",
+          "type": "integer"
+        },
+        "seed": {
+          "title": "Seed",
+          "type": "integer"
+        },
+        "trades_per_draw": {
+          "title": "Trades Per Draw",
+          "type": "integer"
+        },
+        "eligible_entry_bars": {
+          "title": "Eligible Entry Bars",
+          "type": "integer"
+        },
+        "real_net_pnl": {
+          "title": "Real Net Pnl",
+          "type": "number"
+        },
+        "percentile": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Percentile"
+        },
+        "mean": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Mean"
+        },
+        "median": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Median"
+        },
+        "p5": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "P5"
+        },
+        "p95": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "P95"
+        },
+        "histogram": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Histogram"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "draws",
+        "seed",
+        "trades_per_draw",
+        "eligible_entry_bars",
+        "real_net_pnl",
+        "percentile",
+        "mean",
+        "median",
+        "p5",
+        "p95",
+        "histogram"
+      ],
+      "title": "RandomEntries",
+      "type": "object"
+    },
+    "Robustness": {
+      "additionalProperties": false,
+      "properties": {
+        "period": {
+          "$ref": "#/$defs/PeriodPart"
+        },
+        "parameters": {
+          "$ref": "#/$defs/ParameterPart"
+        }
+      },
+      "required": [
+        "period",
+        "parameters"
+      ],
+      "title": "Robustness",
+      "type": "object"
+    },
+    "RunSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "strategy_id": {
+          "title": "Strategy Id",
+          "type": "string"
+        },
+        "strategy_name": {
+          "title": "Strategy Name",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Parameters",
+          "type": "object"
+        },
+        "market": {
+          "title": "Market",
+          "type": "string"
+        },
+        "timeframe": {
+          "title": "Timeframe",
+          "type": "string"
+        },
+        "first_bar": {
+          "format": "date-time",
+          "title": "First Bar",
+          "type": "string"
+        },
+        "last_bar": {
+          "format": "date-time",
+          "title": "Last Bar",
+          "type": "string"
+        },
+        "bar_count": {
+          "title": "Bar Count",
+          "type": "integer"
+        },
+        "trade_count": {
+          "title": "Trade Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "strategy_id",
+        "strategy_name",
+        "parameters",
+        "market",
+        "timeframe",
+        "first_bar",
+        "last_bar",
+        "bar_count",
+        "trade_count"
+      ],
+      "title": "RunSummary",
+      "type": "object"
+    },
+    "SweepAxis": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Values",
+          "type": "array"
+        },
+        "chosen": {
+          "title": "Chosen",
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "label",
+        "values",
+        "chosen"
+      ],
+      "title": "SweepAxis",
+      "type": "object"
+    },
+    "SweepCell": {
+      "additionalProperties": false,
+      "properties": {
+        "coordinates": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Coordinates",
+          "type": "array"
+        },
+        "values": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Values",
+          "type": "object"
+        },
+        "state": {
+          "enum": [
+            "ok",
+            "invalid",
+            "not_run"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "net_pnl": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Net Pnl"
+        },
+        "profit_factor": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Profit Factor"
+        },
+        "trade_count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Trade Count"
+        },
+        "message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Message"
+        }
+      },
+      "required": [
+        "coordinates",
+        "values",
+        "state",
+        "net_pnl",
+        "profit_factor",
+        "trade_count"
+      ],
+      "title": "SweepCell",
+      "type": "object"
+    },
+    "SweepResult": {
+      "additionalProperties": false,
+      "properties": {
+        "axes": {
+          "items": {
+            "$ref": "#/$defs/SweepAxis"
+          },
+          "title": "Axes",
+          "type": "array"
+        },
+        "cells": {
+          "items": {
+            "$ref": "#/$defs/SweepCell"
+          },
+          "title": "Cells",
+          "type": "array"
+        },
+        "chosen": {
+          "items": {
+            "type": "integer"
+          },
+          "title": "Chosen",
+          "type": "array"
+        },
+        "best": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Best"
+        },
+        "combinations": {
+          "title": "Combinations",
+          "type": "integer"
+        },
+        "completed": {
+          "title": "Completed",
+          "type": "integer"
+        },
+        "stopped_by_budget": {
+          "title": "Stopped By Budget",
+          "type": "boolean"
+        },
+        "elapsed_seconds": {
+          "title": "Elapsed Seconds",
+          "type": "number"
+        },
+        "neighbour_count": {
+          "title": "Neighbour Count",
+          "type": "integer"
+        },
+        "profitable_neighbour_fraction": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Profitable Neighbour Fraction"
+        },
+        "neighbour_median_share": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Neighbour Median Share"
+        },
+        "chosen_is_spike": {
+          "title": "Chosen Is Spike",
+          "type": "boolean"
+        },
+        "best_is_spike": {
+          "title": "Best Is Spike",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "axes",
+        "cells",
+        "chosen",
+        "best",
+        "combinations",
+        "completed",
+        "stopped_by_budget",
+        "elapsed_seconds",
+        "neighbour_count",
+        "profitable_neighbour_fraction",
+        "neighbour_median_share",
+        "chosen_is_spike",
+        "best_is_spike"
+      ],
+      "title": "SweepResult",
+      "type": "object"
+    },
+    "VerdictResult": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "CREDIBLE",
+            "FRAGILE",
+            "NOT_CREDIBLE"
+          ],
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        },
+        "sentence": {
+          "title": "Sentence",
+          "type": "string"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/VerdictRule"
+          },
+          "title": "Rules",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "rule",
+        "sentence",
+        "rules"
+      ],
+      "title": "VerdictResult",
+      "type": "object"
+    },
+    "VerdictRule": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "CREDIBLE",
+            "FRAGILE",
+            "NOT_CREDIBLE"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "matched": {
+          "title": "Matched",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "verdict",
+        "description",
+        "matched"
+      ],
+      "title": "VerdictRule",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "run": {
+      "$ref": "#/$defs/RunSummary"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/CheckResult"
+      },
+      "title": "Checks",
+      "type": "array"
+    },
+    "verdict": {
+      "$ref": "#/$defs/VerdictResult"
+    },
+    "config": {
+      "$ref": "#/$defs/HonestyConfig"
+    },
+    "random_entries": {
+      "$ref": "#/$defs/RandomEntries"
+    },
+    "robustness": {
+      "$ref": "#/$defs/Robustness"
+    },
+    "sweep": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SweepResult"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "calendar": {
+      "$ref": "#/$defs/PnlCalendar"
+    },
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "run",
+    "checks",
+    "verdict",
+    "config",
+    "random_entries",
+    "robustness",
+    "sweep",
+    "calendar",
+    "assumptions"
+  ],
+  "type": "object"
+}

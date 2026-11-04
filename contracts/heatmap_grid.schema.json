@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mycelium-backtest/contracts/heatmap_grid.schema.json",
+  "title": "HeatmapGrid",
+  "x-schema-version": 1,
+  "$defs": {
+    "Method": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "volume_rule": {
+          "title": "Volume Rule",
+          "type": "string"
+        },
+        "normalisation": {
+          "title": "Normalisation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "volume_rule",
+        "normalisation"
+      ],
+      "title": "Method",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "mode": {
+      "enum": [
+        "FROM_TRADES",
+        "ESTIMATED_FROM_CANDLES"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "time_bucket_seconds": {
+      "minimum": 1,
+      "title": "Time Bucket Seconds",
+      "type": "integer"
+    },
+    "price_bucket": {
+      "exclusiveMinimum": 0,
+      "title": "Price Bucket",
+      "type": "number"
+    },
+    "columns": {
+      "maximum": 600,
+      "minimum": 1,
+      "title": "Columns",
+      "type": "integer"
+    },
+    "rows": {
+      "maximum": 200,
+      "minimum": 1,
+      "title": "Rows",
+      "type": "integer"
+    },
+    "first_time": {
+      "title": "First Time",
+      "type": "integer"
+    },
+    "lowest_price": {
+      "title": "Lowest Price",
+      "type": "number"
+    },
+    "intensity": {
+      "items": {
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      },
+      "title": "Intensity",
+      "type": "array"
+    },
+    "buy_ratio": {
+      "items": {
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      },
+      "title": "Buy Ratio",
+      "type": "array"
+    },
+    "profile_buy": {
+      "items": {
+        "minimum": 0,
+        "type": "number"
+      },
+      "title": "Profile Buy",
+      "type": "array"
+    },
+    "profile_sell": {
+      "items": {
+        "minimum": 0,
+        "type": "number"
+      },
+      "title": "Profile Sell",
+      "type": "array"
+    },
+    "poc_row": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Poc Row"
+    },
+    "poc_price": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Poc Price"
+    },
+    "total_volume": {
+      "minimum": 0,
+      "title": "Total Volume",
+      "type": "number"
+    },
+    "method": {
+      "$ref": "#/$defs/Method"
+    }
+  },
+  "required": [
+    "mode",
+    "time_bucket_seconds",
+    "price_bucket",
+    "columns",
+    "rows",
+    "first_time",
+    "lowest_price",
+    "intensity",
+    "buy_ratio",
+    "profile_buy",
+    "profile_sell",
+    "poc_row",
+    "poc_price",
+    "total_volume",
+    "method"
+  ],
+  "type": "object"
+}
