@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { STAGES, type RunEvent, type Stage, type Verdict } from '../api/runEvents'
-import { createFakeRun, openRunEvents, type ScenarioName } from '../api/runs'
+import { createFakeRun, createRealRun, openRunEvents, type ScenarioName } from '../api/runs'
 import { HeatmapChart, type ChartProjection } from '../features/chart/HeatmapChart'
-import { generateSampleData } from '../features/chart/sampleData'
+import { defaultSampleOptions, generateSampleData } from '../features/chart/sampleData'
 import { Crawler, type CrawlerDebug, type CrawlerEventSource } from '../features/crawler/Crawler'
 import type { CrawlerHandle, CrawlerLayout, CrawlerMeasure, WrapRegion } from '../features/crawler/types'
 import { Button } from '../ui/Button'
@@ -19,6 +19,20 @@ import {
 } from './runState'
 
 const LOG_LIMIT = 200
+
+const REAL_RUN_BARS = 4758
+const REAL_RUN = {
+  strategy_id: 'rsi_mean_reversion',
+  data: {
+    provider: 'samples',
+    symbol: 'SAMPLE-A',
+    timeframe: '5m',
+    start: '2024-01-02T00:00:00Z',
+    end: '2024-04-01T00:00:00Z',
+  },
+}
+
+type RunKind = ScenarioName | 'real'
 
 declare global {
   interface Window {
@@ -57,7 +71,9 @@ function formatElapsed(ms: number): string {
 type LogLine = { seq: number; text: string; tone: 'normal' | 'fail' }
 
 export function RunSpike() {
-  const data = useMemo(() => generateSampleData(), [])
+  const [chartBars, setChartBars] = useState(defaultSampleOptions.bars)
+  const chartBarsRef = useRef(defaultSampleOptions.bars)
+  const data = useMemo(() => generateSampleData({ ...defaultSampleOptions, bars: chartBars }), [chartBars])
   const resolveRegion = useCallback((region: WrapRegion) => snapRegionToCandles(region, data.candles), [data])
   const stageRef = useRef<HTMLDivElement>(null)
   const chartBoxRef = useRef<HTMLDivElement>(null)
@@ -150,6 +166,8 @@ export function RunSpike() {
     setLog((current) =>
       [...current, { seq: event.seq, text: describeEvent(event), tone: event.type === 'run_failed' ? 'fail' : 'normal' } as LogLine].slice(-LOG_LIMIT),
     )
+    if (event.type === 'run_started' && event.bar_count !== chartBarsRef.current)
+      setError(`The run has ${event.bar_count} bars but the placeholder chart has ${chartBarsRef.current}.`)
     if (event.type === 'stage_started') setAnnouncement(`Stage ${event.stage} started`)
     if (event.type === 'run_done') {
       setAnnouncement(`Run completed, verdict ${event.verdict.replace('_', ' ')}`)
@@ -161,8 +179,14 @@ export function RunSpike() {
     }
   }, [])
 
-  const start = async (scenario: ScenarioName) => {
+  const start = async (kind: RunKind) => {
     closeStreamRef.current?.()
+    const bars = kind === 'real' ? REAL_RUN_BARS : defaultSampleOptions.bars
+    if (bars !== chartBarsRef.current) {
+      setProjection(null)
+      chartBarsRef.current = bars
+      setChartBars(bars)
+    }
     crawlerRef.current?.reset()
     setView({ ...initialRunView(), phase: 'connecting' })
     setLog([])
@@ -172,7 +196,7 @@ export function RunSpike() {
     setStartedAt(startTime)
     setNow(startTime)
     try {
-      const run = await createFakeRun(scenario)
+      const run = kind === 'real' ? await createRealRun(REAL_RUN) : await createFakeRun(kind)
       closeStreamRef.current = openRunEvents(run.events_url, {
         onEvent: handleEvent,
         onInvalid: () => setError('The engine sent an event this page cannot read.'),
@@ -219,6 +243,9 @@ export function RunSpike() {
         <Button onClick={() => void start('failure')} disabled={running}>
           Start failing run
         </Button>
+        <Button onClick={() => void start('real')} disabled={running}>
+          Start real run
+        </Button>
         <Button
           variant="toggle"
           active={reducedMotion}
@@ -242,7 +269,7 @@ export function RunSpike() {
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <section ref={stageRef} className="relative flex min-h-[460px] min-w-0 flex-1 flex-col" aria-label="Run stage">
+        <section key={chartBars} ref={stageRef} className="relative flex min-h-[460px] min-w-0 flex-1 flex-col" aria-label="Run stage">
           <div className="grid shrink-0 grid-cols-6 border-b border-line bg-panel">
             {STAGES.map((stage: Stage, index) => {
               const cell = view.stages[stage]

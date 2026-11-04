@@ -21,10 +21,12 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const activeClass = active ? 'border-accent text-accent-text' : ''
+  const pressed = variant === 'toggle' ? { 'aria-pressed': active } : {}
   return (
     <button
       type={type}
-      className={`inline-flex min-h-[34px] items-center gap-2 rounded-sm px-3 font-mono text-xs font-medium tracking-[0.06em] uppercase transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 ${variantClasses[variant]} ${activeClass} ${className}`}
+      {...pressed}
+      className={`inline-flex min-h-[34px] items-center justify-center gap-2 rounded-sm px-3 font-mono text-xs font-medium tracking-[0.06em] uppercase transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent ${variantClasses[variant]} ${activeClass} ${className}`}
       {...rest}
     />
   )

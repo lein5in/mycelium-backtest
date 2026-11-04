@@ -2,14 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mycelium-backtest/contracts/run_events.schema.json",
   "title": "RunEvent",
-  "x-schema-version": 1,
+  "x-schema-version": 2,
   "$defs": {
     "CheckDone": {
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -112,8 +112,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -162,8 +162,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -206,6 +206,38 @@
           "minLength": 1,
           "title": "Message",
           "type": "string"
+        },
+        "code": {
+          "anyOf": [
+            {
+              "enum": [
+                "invalid_request",
+                "not_found",
+                "range_too_large",
+                "range_invalid",
+                "no_data",
+                "file_too_large",
+                "csv_invalid",
+                "symbol_not_supported",
+                "market_not_compatible",
+                "provider_unavailable",
+                "provider_rate_limited",
+                "rate_limited",
+                "capacity_busy",
+                "run_timeout",
+                "run_cancelled",
+                "run_not_found",
+                "run_not_finished",
+                "internal_error"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Code"
         }
       },
       "required": [
@@ -222,8 +254,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -268,8 +300,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -334,8 +366,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -420,8 +452,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },
@@ -473,8 +505,8 @@
       "additionalProperties": false,
       "properties": {
         "schema_version": {
-          "const": 1,
-          "default": 1,
+          "const": 2,
+          "default": 2,
           "title": "Schema Version",
           "type": "integer"
         },

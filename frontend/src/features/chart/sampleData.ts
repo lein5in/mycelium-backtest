@@ -82,7 +82,7 @@ export function estimateGridFromCandles(candles: Candle[], rows: number, barSeco
       buyRatio[index] = Math.min(1, Math.max(0, ratio))
     })
   })
-  const peak = Math.max(...volumes)
+  const peak = volumes.reduce((max, value) => (value > max ? value : max), 0)
   grid.intensity = volumes.map((value) => (peak > 0 ? value / peak : 0))
   return grid
 }

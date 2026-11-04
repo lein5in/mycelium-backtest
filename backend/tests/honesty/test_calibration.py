@@ -2,12 +2,7 @@ import pytest
 
 from tests.honesty.calibration import SCENARIOS, run_scenario
 
-KNOWN_DISAGREEMENTS = {
-    "strong_first_part_dead_last": (
-        "default rules: the dead last part is slightly positive by chance, out-of-sample only "
-        "warns, period blocks pass, and one WARN still allows CREDIBLE; reported to the planner"
-    ),
-}
+KNOWN_DISAGREEMENTS: dict[str, str] = {}
 
 
 def test_at_least_ten_scenarios_cover_the_required_cases():

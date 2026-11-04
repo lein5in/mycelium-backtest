@@ -1,0 +1,4949 @@
+{
+  "components": {
+    "schemas": {
+      "BarColumns": {
+        "additionalProperties": false,
+        "properties": {
+          "close": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Close",
+            "type": "array"
+          },
+          "high": {
+            "items": {
+              "type": "number"
+            },
+            "title": "High",
+            "type": "array"
+          },
+          "low": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Low",
+            "type": "array"
+          },
+          "open": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Open",
+            "type": "array"
+          },
+          "time": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Time",
+            "type": "array"
+          },
+          "volume": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Volume",
+            "type": "array"
+          }
+        },
+        "required": [
+          "time",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume"
+        ],
+        "title": "BarColumns",
+        "type": "object"
+      },
+      "Calendar": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarBucket"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarBucket"
+            },
+            "title": "Months",
+            "type": "array"
+          },
+          "weeks": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarBucket"
+            },
+            "title": "Weeks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days",
+          "weeks",
+          "months"
+        ],
+        "title": "Calendar",
+        "type": "object"
+      },
+      "CalendarBucket": {
+        "additionalProperties": false,
+        "properties": {
+          "net_pnl": {
+            "title": "Net Pnl",
+            "type": "number"
+          },
+          "period": {
+            "title": "Period",
+            "type": "string"
+          },
+          "trades": {
+            "title": "Trades",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "period",
+          "net_pnl",
+          "trades"
+        ],
+        "title": "CalendarBucket",
+        "type": "object"
+      },
+      "CalendarDay": {
+        "additionalProperties": false,
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "session",
+              "closed",
+              "no_data",
+              "other_month"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "net_pnl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Pnl"
+          },
+          "trades": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trades"
+          }
+        },
+        "required": [
+          "date",
+          "kind",
+          "net_pnl",
+          "trades"
+        ],
+        "title": "CalendarDay",
+        "type": "object"
+      },
+      "CalendarMonth": {
+        "additionalProperties": false,
+        "properties": {
+          "best_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Day"
+          },
+          "best_day_pnl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Day Pnl"
+          },
+          "green_weeks": {
+            "title": "Green Weeks",
+            "type": "integer"
+          },
+          "month": {
+            "pattern": "^\\d{4}-\\d{2}$",
+            "title": "Month",
+            "type": "string"
+          },
+          "net_pnl": {
+            "title": "Net Pnl",
+            "type": "number"
+          },
+          "trades": {
+            "title": "Trades",
+            "type": "integer"
+          },
+          "weeks": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarWeek"
+            },
+            "title": "Weeks",
+            "type": "array"
+          },
+          "weeks_with_trades": {
+            "title": "Weeks With Trades",
+            "type": "integer"
+          },
+          "worst_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worst Day"
+          },
+          "worst_day_pnl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Worst Day Pnl"
+          }
+        },
+        "required": [
+          "month",
+          "weeks",
+          "net_pnl",
+          "trades",
+          "green_weeks",
+          "weeks_with_trades",
+          "best_day",
+          "best_day_pnl",
+          "worst_day",
+          "worst_day_pnl"
+        ],
+        "title": "CalendarMonth",
+        "type": "object"
+      },
+      "CalendarWeek": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarDay"
+            },
+            "title": "Days",
+            "type": "array"
+          },
+          "monday": {
+            "format": "date",
+            "title": "Monday",
+            "type": "string"
+          },
+          "net_pnl": {
+            "title": "Net Pnl",
+            "type": "number"
+          },
+          "trades": {
+            "title": "Trades",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "monday",
+          "days",
+          "net_pnl",
+          "trades"
+        ],
+        "title": "CalendarWeek",
+        "type": "object"
+      },
+      "CheckResult": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "headline": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Headline",
+            "type": "string"
+          },
+          "id": {
+            "enum": [
+              "costs",
+              "trade_count",
+              "without_best_trade",
+              "out_of_sample",
+              "versus_random",
+              "robustness"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "insufficient_data": {
+            "title": "Insufficient Data",
+            "type": "boolean"
+          },
+          "measured": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Measured",
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "WARN",
+              "FAIL"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "thresholds": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Thresholds",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "headline",
+          "detail",
+          "insufficient_data",
+          "measured",
+          "thresholds"
+        ],
+        "title": "CheckResult",
+        "type": "object"
+      },
+      "CostModel": {
+        "additionalProperties": false,
+        "properties": {
+          "fee_pct": {
+            "default": 0.0,
+            "maximum": 5.0,
+            "minimum": 0.0,
+            "title": "Fee Pct",
+            "type": "number"
+          },
+          "fixed_fee": {
+            "default": 0.0,
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Fixed Fee",
+            "type": "number"
+          },
+          "slippage": {
+            "discriminator": {
+              "mapping": {
+                "bps": "#/components/schemas/SlippageBps",
+                "ticks": "#/components/schemas/SlippageTicks"
+              },
+              "propertyName": "unit"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SlippageTicks"
+              },
+              {
+                "$ref": "#/components/schemas/SlippageBps"
+              }
+            ],
+            "title": "Slippage"
+          }
+        },
+        "title": "CostModel",
+        "type": "object"
+      },
+      "CostTotals": {
+        "additionalProperties": false,
+        "properties": {
+          "fees": {
+            "title": "Fees",
+            "type": "number"
+          },
+          "fills": {
+            "title": "Fills",
+            "type": "integer"
+          },
+          "gross_pnl": {
+            "title": "Gross Pnl",
+            "type": "number"
+          },
+          "net_pnl": {
+            "title": "Net Pnl",
+            "type": "number"
+          },
+          "slippage": {
+            "title": "Slippage",
+            "type": "number"
+          }
+        },
+        "required": [
+          "fills",
+          "fees",
+          "slippage",
+          "gross_pnl",
+          "net_pnl"
+        ],
+        "title": "CostTotals",
+        "type": "object"
+      },
+      "CsvPreview": {
+        "additionalProperties": false,
+        "properties": {
+          "bar_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bar Count"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "note": {
+            "default": "The file is processed in memory to produce this preview and is not kept.",
+            "title": "Note",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "report": {
+            "$ref": "#/components/schemas/CsvReport"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceDescriptor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "start": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "timeframe": {
+            "anyOf": [
+              {
+                "enum": [
+                  "1m",
+                  "5m",
+                  "15m",
+                  "30m",
+                  "1h",
+                  "4h",
+                  "1d"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeframe"
+          }
+        },
+        "required": [
+          "ok",
+          "report",
+          "bar_count",
+          "timeframe",
+          "start",
+          "end",
+          "source"
+        ],
+        "title": "CsvPreview",
+        "type": "object"
+      },
+      "CsvProblem": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "column": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Column"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "line",
+          "column",
+          "code",
+          "message"
+        ],
+        "title": "CsvProblem",
+        "type": "object"
+      },
+      "CsvReport": {
+        "additionalProperties": false,
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "delimiter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delimiter"
+          },
+          "gaps": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GapReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mapping": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Mapping",
+            "type": "object"
+          },
+          "problem_count": {
+            "title": "Problem Count",
+            "type": "integer"
+          },
+          "problems": {
+            "items": {
+              "$ref": "#/components/schemas/CsvProblem"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "rules": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "timeframe": {
+            "anyOf": [
+              {
+                "enum": [
+                  "1m",
+                  "5m",
+                  "15m",
+                  "30m",
+                  "1h",
+                  "4h",
+                  "1d"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeframe"
+          },
+          "timestamp_format": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timestamp Format"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows",
+          "columns",
+          "delimiter",
+          "mapping",
+          "timestamp_format",
+          "timezone",
+          "timeframe",
+          "problems",
+          "problem_count",
+          "warnings",
+          "gaps",
+          "rules"
+        ],
+        "title": "CsvReport",
+        "type": "object"
+      },
+      "DailyEquity": {
+        "additionalProperties": false,
+        "properties": {
+          "drawdown_pct": {
+            "title": "Drawdown Pct",
+            "type": "number"
+          },
+          "equity": {
+            "title": "Equity",
+            "type": "number"
+          },
+          "session": {
+            "format": "date",
+            "title": "Session",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session",
+          "equity",
+          "drawdown_pct"
+        ],
+        "title": "DailyEquity",
+        "type": "object"
+      },
+      "DataSourceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "format": "date-time",
+            "title": "End",
+            "type": "string"
+          },
+          "provider": {
+            "pattern": "^[a-z_]{1,32}$",
+            "title": "Provider",
+            "type": "string"
+          },
+          "start": {
+            "format": "date-time",
+            "title": "Start",
+            "type": "string"
+          },
+          "symbol": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Symbol",
+            "type": "string"
+          },
+          "timeframe": {
+            "enum": [
+              "1m",
+              "5m",
+              "15m",
+              "30m",
+              "1h",
+              "4h",
+              "1d"
+            ],
+            "title": "Timeframe",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "symbol",
+          "timeframe",
+          "start",
+          "end"
+        ],
+        "title": "DataSourceRequest",
+        "type": "object"
+      },
+      "Diagnostics": {
+        "additionalProperties": false,
+        "properties": {
+          "entries": {
+            "title": "Entries",
+            "type": "integer"
+          },
+          "signals": {
+            "title": "Signals",
+            "type": "integer"
+          },
+          "skipped": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Skipped",
+            "type": "object"
+          }
+        },
+        "required": [
+          "signals",
+          "entries",
+          "skipped"
+        ],
+        "title": "Diagnostics",
+        "type": "object"
+      },
+      "DrawLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "default": {
+            "title": "Default",
+            "type": "integer"
+          },
+          "maximum": {
+            "title": "Maximum",
+            "type": "integer"
+          },
+          "minimum": {
+            "title": "Minimum",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "minimum",
+          "maximum",
+          "default"
+        ],
+        "title": "DrawLimits",
+        "type": "object"
+      },
+      "ErrorBody": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "invalid_request",
+              "not_found",
+              "range_too_large",
+              "range_invalid",
+              "no_data",
+              "file_too_large",
+              "csv_invalid",
+              "symbol_not_supported",
+              "market_not_compatible",
+              "provider_unavailable",
+              "provider_rate_limited",
+              "rate_limited",
+              "capacity_busy",
+              "run_timeout",
+              "run_cancelled",
+              "run_not_found",
+              "run_not_finished",
+              "internal_error"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "$ref": "#/components/schemas/JsonValue"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "status": {
+            "title": "Status",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "status",
+          "message",
+          "request_id"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "FixedFraction": {
+        "additionalProperties": false,
+        "properties": {
+          "fraction": {
+            "default": 1.0,
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Fraction",
+            "type": "number"
+          },
+          "type": {
+            "const": "fixed_fraction",
+            "default": "fixed_fraction",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "FixedFraction",
+        "type": "object"
+      },
+      "Gap": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "format": "date-time",
+            "title": "End",
+            "type": "string"
+          },
+          "missing_bars": {
+            "title": "Missing Bars",
+            "type": "integer"
+          },
+          "start": {
+            "format": "date-time",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "missing_bars"
+        ],
+        "title": "Gap",
+        "type": "object"
+      },
+      "GapReport": {
+        "additionalProperties": false,
+        "properties": {
+          "gap_count": {
+            "title": "Gap Count",
+            "type": "integer"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/components/schemas/Gap"
+            },
+            "maxItems": 20,
+            "title": "Gaps",
+            "type": "array"
+          },
+          "missing_bars": {
+            "title": "Missing Bars",
+            "type": "integer"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "missing_bars",
+          "gap_count",
+          "gaps",
+          "note"
+        ],
+        "title": "GapReport",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Halt": {
+        "additionalProperties": false,
+        "properties": {
+          "bar_index": {
+            "title": "Bar Index",
+            "type": "integer"
+          },
+          "drawdown_pct": {
+            "title": "Drawdown Pct",
+            "type": "number"
+          },
+          "reason": {
+            "const": "max_drawdown",
+            "title": "Reason",
+            "type": "string"
+          },
+          "time": {
+            "format": "date-time",
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "bar_index",
+          "time",
+          "drawdown_pct"
+        ],
+        "title": "Halt",
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "version"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "HeatmapGrid": {
+        "additionalProperties": false,
+        "properties": {
+          "buy_ratio": {
+            "items": {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            "title": "Buy Ratio",
+            "type": "array"
+          },
+          "columns": {
+            "maximum": 600.0,
+            "minimum": 1.0,
+            "title": "Columns",
+            "type": "integer"
+          },
+          "first_time": {
+            "title": "First Time",
+            "type": "integer"
+          },
+          "intensity": {
+            "items": {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            "title": "Intensity",
+            "type": "array"
+          },
+          "lowest_price": {
+            "title": "Lowest Price",
+            "type": "number"
+          },
+          "method": {
+            "$ref": "#/components/schemas/Method"
+          },
+          "mode": {
+            "enum": [
+              "FROM_TRADES",
+              "ESTIMATED_FROM_CANDLES"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "poc_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poc Price"
+          },
+          "poc_row": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Poc Row"
+          },
+          "price_bucket": {
+            "exclusiveMinimum": 0.0,
+            "title": "Price Bucket",
+            "type": "number"
+          },
+          "profile_buy": {
+            "items": {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            "title": "Profile Buy",
+            "type": "array"
+          },
+          "profile_sell": {
+            "items": {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            "title": "Profile Sell",
+            "type": "array"
+          },
+          "rows": {
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "title": "Rows",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "time_bucket_seconds": {
+            "minimum": 1.0,
+            "title": "Time Bucket Seconds",
+            "type": "integer"
+          },
+          "total_volume": {
+            "minimum": 0.0,
+            "title": "Total Volume",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mode",
+          "time_bucket_seconds",
+          "price_bucket",
+          "columns",
+          "rows",
+          "first_time",
+          "lowest_price",
+          "intensity",
+          "buy_ratio",
+          "profile_buy",
+          "profile_sell",
+          "poc_row",
+          "poc_price",
+          "total_volume",
+          "method"
+        ],
+        "title": "HeatmapGrid",
+        "type": "object"
+      },
+      "Histogram": {
+        "additionalProperties": false,
+        "properties": {
+          "counts": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "array"
+          },
+          "edges": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "real_bin": {
+            "title": "Real Bin",
+            "type": "integer"
+          },
+          "real_value": {
+            "title": "Real Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "edges",
+          "counts",
+          "real_value",
+          "real_bin"
+        ],
+        "title": "Histogram",
+        "type": "object"
+      },
+      "HonestyConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "best_trade_max_share": {
+            "default": 0.4,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Best Trade Max Share",
+            "type": "number"
+          },
+          "best_trade_min_profit_factor": {
+            "default": 1.1,
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Best Trade Min Profit Factor",
+            "type": "number"
+          },
+          "cost_multiplier": {
+            "default": 2.0,
+            "exclusiveMinimum": 1.0,
+            "maximum": 10.0,
+            "title": "Cost Multiplier",
+            "type": "number"
+          },
+          "costs_fail_share": {
+            "default": 0.8,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Costs Fail Share",
+            "type": "number"
+          },
+          "costs_pass_share": {
+            "default": 0.5,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Costs Pass Share",
+            "type": "number"
+          },
+          "min_trades": {
+            "default": 30,
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Min Trades",
+            "type": "integer"
+          },
+          "min_trades_per_split": {
+            "default": 30,
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Min Trades Per Split",
+            "type": "integer"
+          },
+          "out_of_sample_min_pf_ratio": {
+            "default": 0.7,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Out Of Sample Min Pf Ratio",
+            "type": "number"
+          },
+          "period_blocks": {
+            "default": 4,
+            "maximum": 20.0,
+            "minimum": 2.0,
+            "title": "Period Blocks",
+            "type": "integer"
+          },
+          "period_fail_share": {
+            "default": 0.8,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Period Fail Share",
+            "type": "number"
+          },
+          "period_min_positive_fraction": {
+            "default": 0.5,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Period Min Positive Fraction",
+            "type": "number"
+          },
+          "period_min_trades_per_block": {
+            "default": 10,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Period Min Trades Per Block",
+            "type": "integer"
+          },
+          "period_warn_share": {
+            "default": 0.5,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Period Warn Share",
+            "type": "number"
+          },
+          "random_bins": {
+            "default": 40,
+            "maximum": 200.0,
+            "minimum": 10.0,
+            "title": "Random Bins",
+            "type": "integer"
+          },
+          "random_draws": {
+            "default": 1000,
+            "maximum": 5000.0,
+            "minimum": 100.0,
+            "title": "Random Draws",
+            "type": "integer"
+          },
+          "random_pass_percentile": {
+            "default": 95.0,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Random Pass Percentile",
+            "type": "number"
+          },
+          "random_seed": {
+            "default": 1,
+            "maximum": 4294967295.0,
+            "minimum": 0.0,
+            "title": "Random Seed",
+            "type": "integer"
+          },
+          "random_warn_percentile": {
+            "default": 80.0,
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Random Warn Percentile",
+            "type": "number"
+          },
+          "split_fraction": {
+            "default": 0.7,
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Split Fraction",
+            "type": "number"
+          },
+          "sweep_max_combinations": {
+            "default": 400,
+            "maximum": 400.0,
+            "minimum": 1.0,
+            "title": "Sweep Max Combinations",
+            "type": "integer"
+          },
+          "sweep_pass_neighbours": {
+            "default": 0.7,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Sweep Pass Neighbours",
+            "type": "number"
+          },
+          "sweep_relative_spacing": {
+            "default": 0.1,
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Sweep Relative Spacing",
+            "type": "number"
+          },
+          "sweep_spike_ratio": {
+            "default": 0.5,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Sweep Spike Ratio",
+            "type": "number"
+          },
+          "sweep_time_budget_seconds": {
+            "default": 60.0,
+            "exclusiveMinimum": 0.0,
+            "maximum": 600.0,
+            "title": "Sweep Time Budget Seconds",
+            "type": "number"
+          },
+          "sweep_values_per_parameter": {
+            "default": 5,
+            "maximum": 20.0,
+            "minimum": 3.0,
+            "title": "Sweep Values Per Parameter",
+            "type": "integer"
+          },
+          "sweep_warn_neighbours": {
+            "default": 0.4,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Sweep Warn Neighbours",
+            "type": "number"
+          },
+          "trade_count_pass": {
+            "default": 100,
+            "maximum": 100000.0,
+            "minimum": 1.0,
+            "title": "Trade Count Pass",
+            "type": "integer"
+          },
+          "trade_count_warn": {
+            "default": 30,
+            "maximum": 100000.0,
+            "minimum": 1.0,
+            "title": "Trade Count Warn",
+            "type": "integer"
+          }
+        },
+        "title": "HonestyConfig",
+        "type": "object"
+      },
+      "HonestyOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "random_draws": {
+            "default": 1000,
+            "maximum": 5000.0,
+            "minimum": 100.0,
+            "title": "Random Draws",
+            "type": "integer"
+          },
+          "seed": {
+            "default": 1,
+            "maximum": 4294967295.0,
+            "minimum": 0.0,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "sweep": {
+            "default": true,
+            "title": "Sweep",
+            "type": "boolean"
+          }
+        },
+        "title": "HonestyOptions",
+        "type": "object"
+      },
+      "HonestyReport": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "calendar": {
+            "$ref": "#/components/schemas/PnlCalendar"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/CheckResult"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "config": {
+            "$ref": "#/components/schemas/HonestyConfig"
+          },
+          "random_entries": {
+            "$ref": "#/components/schemas/RandomEntries"
+          },
+          "robustness": {
+            "$ref": "#/components/schemas/Robustness"
+          },
+          "run": {
+            "$ref": "#/components/schemas/RunSummary"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "sweep": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SweepResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "verdict": {
+            "$ref": "#/components/schemas/VerdictResult"
+          }
+        },
+        "required": [
+          "run",
+          "checks",
+          "verdict",
+          "config",
+          "random_entries",
+          "robustness",
+          "sweep",
+          "calendar",
+          "assumptions"
+        ],
+        "title": "HonestyReport",
+        "type": "object"
+      },
+      "JsonValue": {},
+      "LimitsDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "concurrent_runs_per_ip": {
+            "title": "Concurrent Runs Per Ip",
+            "type": "integer"
+          },
+          "csv_max_bytes": {
+            "title": "Csv Max Bytes",
+            "type": "integer"
+          },
+          "csv_max_rows": {
+            "title": "Csv Max Rows",
+            "type": "integer"
+          },
+          "json_max_bytes": {
+            "title": "Json Max Bytes",
+            "type": "integer"
+          },
+          "max_parameters": {
+            "title": "Max Parameters",
+            "type": "integer"
+          },
+          "max_result_bars": {
+            "title": "Max Result Bars",
+            "type": "integer"
+          },
+          "max_result_trades": {
+            "title": "Max Result Trades",
+            "type": "integer"
+          },
+          "random_draws": {
+            "$ref": "#/components/schemas/DrawLimits"
+          },
+          "range_days": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": "object"
+            },
+            "title": "Range Days",
+            "type": "object"
+          },
+          "retention_minutes": {
+            "title": "Retention Minutes",
+            "type": "number"
+          },
+          "run_timeout_seconds": {
+            "title": "Run Timeout Seconds",
+            "type": "number"
+          },
+          "runs_per_hour_per_ip": {
+            "title": "Runs Per Hour Per Ip",
+            "type": "integer"
+          },
+          "sweep_max_combinations": {
+            "title": "Sweep Max Combinations",
+            "type": "integer"
+          },
+          "sweep_values_per_parameter": {
+            "title": "Sweep Values Per Parameter",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "range_days",
+          "csv_max_bytes",
+          "csv_max_rows",
+          "json_max_bytes",
+          "max_parameters",
+          "random_draws",
+          "sweep_max_combinations",
+          "sweep_values_per_parameter",
+          "run_timeout_seconds",
+          "retention_minutes",
+          "runs_per_hour_per_ip",
+          "concurrent_runs_per_ip",
+          "max_result_bars",
+          "max_result_trades"
+        ],
+        "title": "LimitsDocument",
+        "type": "object"
+      },
+      "MarketInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "us_equity",
+              "crypto_24x7"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "MarketInfo",
+        "type": "object"
+      },
+      "MarketsDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "markets": {
+            "items": {
+              "$ref": "#/components/schemas/MarketInfo"
+            },
+            "title": "Markets",
+            "type": "array"
+          },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderInfo"
+            },
+            "title": "Providers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "markets",
+          "providers"
+        ],
+        "title": "MarketsDocument",
+        "type": "object"
+      },
+      "Method": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "normalisation": {
+            "title": "Normalisation",
+            "type": "string"
+          },
+          "volume_rule": {
+            "title": "Volume Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "volume_rule",
+          "normalisation"
+        ],
+        "title": "Method",
+        "type": "object"
+      },
+      "Metrics": {
+        "additionalProperties": false,
+        "properties": {
+          "annual_volatility_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Annual Volatility Pct"
+          },
+          "annualisation_days": {
+            "title": "Annualisation Days",
+            "type": "integer"
+          },
+          "cagr_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cagr Pct"
+          },
+          "exposure_pct": {
+            "title": "Exposure Pct",
+            "type": "number"
+          },
+          "final_equity": {
+            "title": "Final Equity",
+            "type": "number"
+          },
+          "initial_capital": {
+            "title": "Initial Capital",
+            "type": "number"
+          },
+          "max_drawdown": {
+            "title": "Max Drawdown",
+            "type": "number"
+          },
+          "max_drawdown_pct": {
+            "title": "Max Drawdown Pct",
+            "type": "number"
+          },
+          "period_days": {
+            "title": "Period Days",
+            "type": "number"
+          },
+          "sharpe": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sharpe"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/TradeSummary"
+          }
+        },
+        "required": [
+          "summary",
+          "initial_capital",
+          "final_equity",
+          "max_drawdown_pct",
+          "max_drawdown",
+          "exposure_pct",
+          "sharpe",
+          "cagr_pct",
+          "annual_volatility_pct",
+          "annualisation_days",
+          "period_days"
+        ],
+        "title": "Metrics",
+        "type": "object"
+      },
+      "ParamDef": {
+        "additionalProperties": false,
+        "properties": {
+          "choices": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Choices"
+          },
+          "default": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Default"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "market_defaults": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                },
+                "propertyNames": {
+                  "enum": [
+                    "us_equity",
+                    "crypto_24x7"
+                  ]
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Defaults"
+          },
+          "maximum": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Maximum"
+          },
+          "minimum": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Minimum"
+          },
+          "name": {
+            "pattern": "^[a-z][a-z0-9_]{0,39}$",
+            "title": "Name",
+            "type": "string"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          },
+          "type": {
+            "enum": [
+              "int",
+              "float",
+              "choice"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "type",
+          "default",
+          "description"
+        ],
+        "title": "ParamDef",
+        "type": "object"
+      },
+      "ParameterPart": {
+        "additionalProperties": false,
+        "properties": {
+          "insufficient_data": {
+            "title": "Insufficient Data",
+            "type": "boolean"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "WARN",
+              "FAIL",
+              "not_run"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "insufficient_data",
+          "reason"
+        ],
+        "title": "ParameterPart",
+        "type": "object"
+      },
+      "PeriodBlock": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "first_trade": {
+            "title": "First Trade",
+            "type": "integer"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "last_trade": {
+            "title": "Last Trade",
+            "type": "integer"
+          },
+          "net_pnl": {
+            "title": "Net Pnl",
+            "type": "number"
+          },
+          "share_of_profit": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Of Profit"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "trade_count": {
+            "title": "Trade Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "index",
+          "first_trade",
+          "last_trade",
+          "trade_count",
+          "start",
+          "end",
+          "net_pnl",
+          "share_of_profit"
+        ],
+        "title": "PeriodBlock",
+        "type": "object"
+      },
+      "PeriodPart": {
+        "additionalProperties": false,
+        "properties": {
+          "blocks": {
+            "items": {
+              "$ref": "#/components/schemas/PeriodBlock"
+            },
+            "title": "Blocks",
+            "type": "array"
+          },
+          "insufficient_data": {
+            "title": "Insufficient Data",
+            "type": "boolean"
+          },
+          "max_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Share"
+          },
+          "positive_fraction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Positive Fraction"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "WARN",
+              "FAIL"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "total_net_pnl": {
+            "title": "Total Net Pnl",
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "insufficient_data",
+          "blocks",
+          "max_share",
+          "positive_fraction",
+          "total_net_pnl"
+        ],
+        "title": "PeriodPart",
+        "type": "object"
+      },
+      "PnlCalendar": {
+        "additionalProperties": false,
+        "properties": {
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/CalendarMonth"
+            },
+            "title": "Months",
+            "type": "array"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule",
+          "timezone",
+          "months"
+        ],
+        "title": "PnlCalendar",
+        "type": "object"
+      },
+      "ProviderInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "attribution": {
+            "title": "Attribution",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "history_days": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "History Days"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "candles",
+              "trades",
+              "sample",
+              "csv"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "markets": {
+            "items": {
+              "enum": [
+                "us_equity",
+                "crypto_24x7"
+              ],
+              "type": "string"
+            },
+            "title": "Markets",
+            "type": "array"
+          },
+          "max_range_days": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Max Range Days",
+            "type": "object"
+          },
+          "mode": {
+            "enum": [
+              "PUBLIC EXCHANGE DATA",
+              "SAMPLE DATA",
+              "USER CSV",
+              "PERSONAL USE ONLY"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "symbols": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Symbols",
+            "type": "array"
+          },
+          "terms_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terms Url"
+          },
+          "timeframes": {
+            "items": {
+              "enum": [
+                "1m",
+                "5m",
+                "15m",
+                "30m",
+                "1h",
+                "4h",
+                "1d"
+              ],
+              "type": "string"
+            },
+            "title": "Timeframes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "kind",
+          "enabled",
+          "markets",
+          "timeframes",
+          "max_range_days",
+          "symbols",
+          "terms_url",
+          "attribution",
+          "mode",
+          "note"
+        ],
+        "title": "ProviderInfo",
+        "type": "object"
+      },
+      "RandomEntries": {
+        "additionalProperties": false,
+        "properties": {
+          "draws": {
+            "title": "Draws",
+            "type": "integer"
+          },
+          "eligible_entry_bars": {
+            "title": "Eligible Entry Bars",
+            "type": "integer"
+          },
+          "histogram": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Histogram"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean"
+          },
+          "median": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median"
+          },
+          "p5": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P5"
+          },
+          "p95": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95"
+          },
+          "percentile": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentile"
+          },
+          "real_net_pnl": {
+            "title": "Real Net Pnl",
+            "type": "number"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "trades_per_draw": {
+            "title": "Trades Per Draw",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "draws",
+          "seed",
+          "trades_per_draw",
+          "eligible_entry_bars",
+          "real_net_pnl",
+          "percentile",
+          "mean",
+          "median",
+          "p5",
+          "p95",
+          "histogram"
+        ],
+        "title": "RandomEntries",
+        "type": "object"
+      },
+      "RegistryDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "strategies": {
+            "items": {
+              "$ref": "#/components/schemas/StrategyMetadata"
+            },
+            "title": "Strategies",
+            "type": "array"
+          }
+        },
+        "required": [
+          "strategies"
+        ],
+        "title": "RegistryDocument",
+        "type": "object"
+      },
+      "RiskLimits": {
+        "additionalProperties": false,
+        "properties": {
+          "max_drawdown_pct": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 100.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Drawdown Pct"
+          },
+          "max_session_loss_pct": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 100.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Session Loss Pct"
+          },
+          "max_trades_per_session": {
+            "default": 1,
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Max Trades Per Session",
+            "type": "integer"
+          }
+        },
+        "title": "RiskLimits",
+        "type": "object"
+      },
+      "RiskPercent": {
+        "additionalProperties": false,
+        "properties": {
+          "percent": {
+            "default": 1.0,
+            "exclusiveMinimum": 0.0,
+            "maximum": 100.0,
+            "title": "Percent",
+            "type": "number"
+          },
+          "type": {
+            "const": "risk_percent",
+            "default": "risk_percent",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "RiskPercent",
+        "type": "object"
+      },
+      "Robustness": {
+        "additionalProperties": false,
+        "properties": {
+          "parameters": {
+            "$ref": "#/components/schemas/ParameterPart"
+          },
+          "period": {
+            "$ref": "#/components/schemas/PeriodPart"
+          }
+        },
+        "required": [
+          "period",
+          "parameters"
+        ],
+        "title": "Robustness",
+        "type": "object"
+      },
+      "RunCreated": {
+        "additionalProperties": false,
+        "properties": {
+          "events_url": {
+            "title": "Events Url",
+            "type": "string"
+          },
+          "result_url": {
+            "title": "Result Url",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "done",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_url": {
+            "title": "Status Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "status",
+          "events_url",
+          "status_url",
+          "result_url"
+        ],
+        "title": "RunCreated",
+        "type": "object"
+      },
+      "RunError": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "title": "Details"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "stage"
+        ],
+        "title": "RunError",
+        "type": "object"
+      },
+      "RunRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "costs": {
+            "$ref": "#/components/schemas/CostModel"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DataSourceRequest"
+          },
+          "honesty": {
+            "$ref": "#/components/schemas/HonestyOptions"
+          },
+          "initial_capital": {
+            "default": 10000.0,
+            "exclusiveMinimum": 0.0,
+            "maximum": 1000000000.0,
+            "title": "Initial Capital",
+            "type": "number"
+          },
+          "parameters": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parameters"
+          },
+          "quantity_step": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 1000000.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity Step"
+          },
+          "risk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RiskLimits"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "session_anchor": {
+            "anyOf": [
+              {
+                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session Anchor"
+          },
+          "sizing": {
+            "anyOf": [
+              {
+                "discriminator": {
+                  "mapping": {
+                    "fixed_fraction": "#/components/schemas/FixedFraction",
+                    "risk_percent": "#/components/schemas/RiskPercent"
+                  },
+                  "propertyName": "type"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/FixedFraction"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RiskPercent"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sizing"
+          },
+          "strategy_id": {
+            "enum": [
+              "orb",
+              "vwap_mean_reversion",
+              "gap_fade",
+              "donchian_breakout",
+              "rsi_mean_reversion",
+              "custom"
+            ],
+            "title": "Strategy Id",
+            "type": "string"
+          },
+          "tick_size": {
+            "default": 0.01,
+            "exclusiveMinimum": 0.0,
+            "maximum": 1000.0,
+            "title": "Tick Size",
+            "type": "number"
+          }
+        },
+        "required": [
+          "strategy_id",
+          "data"
+        ],
+        "title": "RunRequest",
+        "type": "object"
+      },
+      "RunResult": {
+        "additionalProperties": false,
+        "properties": {
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "bar_count": {
+            "title": "Bar Count",
+            "type": "integer"
+          },
+          "calendar": {
+            "$ref": "#/components/schemas/Calendar"
+          },
+          "daily_equity": {
+            "items": {
+              "$ref": "#/components/schemas/DailyEquity"
+            },
+            "title": "Daily Equity",
+            "type": "array"
+          },
+          "diagnostics": {
+            "$ref": "#/components/schemas/Diagnostics"
+          },
+          "first_bar": {
+            "format": "date-time",
+            "title": "First Bar",
+            "type": "string"
+          },
+          "halted": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Halt"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_bar": {
+            "format": "date-time",
+            "title": "Last Bar",
+            "type": "string"
+          },
+          "market": {
+            "title": "Market",
+            "type": "string"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/Metrics"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "strategy": {
+            "title": "Strategy",
+            "type": "string"
+          },
+          "timeframe": {
+            "title": "Timeframe",
+            "type": "string"
+          },
+          "trades": {
+            "items": {
+              "$ref": "#/components/schemas/Trade"
+            },
+            "title": "Trades",
+            "type": "array"
+          },
+          "warmup_bars": {
+            "title": "Warmup Bars",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "strategy",
+          "market",
+          "timeframe",
+          "bar_count",
+          "first_bar",
+          "last_bar",
+          "warmup_bars",
+          "trades",
+          "daily_equity",
+          "metrics",
+          "calendar",
+          "halted",
+          "diagnostics",
+          "assumptions"
+        ],
+        "title": "RunResult",
+        "type": "object"
+      },
+      "RunResultPayload": {
+        "additionalProperties": false,
+        "properties": {
+          "bars": {
+            "$ref": "#/components/schemas/BarColumns"
+          },
+          "costs": {
+            "$ref": "#/components/schemas/CostTotals"
+          },
+          "csv_report": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CsvReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Data Warnings",
+            "type": "array"
+          },
+          "gaps": {
+            "$ref": "#/components/schemas/GapReport"
+          },
+          "heatmap": {
+            "$ref": "#/components/schemas/HeatmapGrid"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/Truncation"
+          },
+          "report": {
+            "$ref": "#/components/schemas/HonestyReport"
+          },
+          "request": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Request",
+            "type": "object"
+          },
+          "result": {
+            "$ref": "#/components/schemas/RunResult"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "schema_version": {
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SourceDescriptor"
+          }
+        },
+        "required": [
+          "run_id",
+          "request",
+          "source",
+          "gaps",
+          "data_warnings",
+          "csv_report",
+          "result",
+          "report",
+          "heatmap",
+          "costs",
+          "bars",
+          "limits"
+        ],
+        "title": "RunResultPayload",
+        "type": "object"
+      },
+      "RunStatusDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RunError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "events": {
+            "title": "Events",
+            "type": "integer"
+          },
+          "events_url": {
+            "title": "Events Url",
+            "type": "string"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "result_url": {
+            "title": "Result Url",
+            "type": "string"
+          },
+          "run_id": {
+            "title": "Run Id",
+            "type": "string"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "enum": [
+                  "DATA",
+                  "SIGNALS",
+                  "SIMULATOR",
+                  "COSTS",
+                  "AUDITOR",
+                  "REPORTER"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "done",
+              "failed",
+              "cancelled"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verdict"
+          }
+        },
+        "required": [
+          "run_id",
+          "status",
+          "stage",
+          "verdict",
+          "created_at",
+          "started_at",
+          "finished_at",
+          "events",
+          "error",
+          "events_url",
+          "result_url"
+        ],
+        "title": "RunStatusDocument",
+        "type": "object"
+      },
+      "RunSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "bar_count": {
+            "title": "Bar Count",
+            "type": "integer"
+          },
+          "first_bar": {
+            "format": "date-time",
+            "title": "First Bar",
+            "type": "string"
+          },
+          "last_bar": {
+            "format": "date-time",
+            "title": "Last Bar",
+            "type": "string"
+          },
+          "market": {
+            "title": "Market",
+            "type": "string"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Parameters",
+            "type": "object"
+          },
+          "strategy_id": {
+            "title": "Strategy Id",
+            "type": "string"
+          },
+          "strategy_name": {
+            "title": "Strategy Name",
+            "type": "string"
+          },
+          "timeframe": {
+            "title": "Timeframe",
+            "type": "string"
+          },
+          "trade_count": {
+            "title": "Trade Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "strategy_id",
+          "strategy_name",
+          "parameters",
+          "market",
+          "timeframe",
+          "first_bar",
+          "last_bar",
+          "bar_count",
+          "trade_count"
+        ],
+        "title": "RunSummary",
+        "type": "object"
+      },
+      "SlippageBps": {
+        "additionalProperties": false,
+        "properties": {
+          "unit": {
+            "const": "bps",
+            "default": "bps",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "default": 0.0,
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "title": "SlippageBps",
+        "type": "object"
+      },
+      "SlippageTicks": {
+        "additionalProperties": false,
+        "properties": {
+          "unit": {
+            "const": "ticks",
+            "default": "ticks",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "default": 0.0,
+            "maximum": 1000.0,
+            "minimum": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "title": "SlippageTicks",
+        "type": "object"
+      },
+      "SourceDescriptor": {
+        "additionalProperties": false,
+        "properties": {
+          "attribution": {
+            "title": "Attribution",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End"
+          },
+          "market": {
+            "enum": [
+              "us_equity",
+              "crypto_24x7"
+            ],
+            "title": "Market",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "PUBLIC EXCHANGE DATA",
+              "SAMPLE DATA",
+              "USER CSV",
+              "PERSONAL USE ONLY"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start"
+          },
+          "symbol": {
+            "title": "Symbol",
+            "type": "string"
+          },
+          "terms_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Terms Url"
+          },
+          "timeframe": {
+            "anyOf": [
+              {
+                "enum": [
+                  "1m",
+                  "5m",
+                  "15m",
+                  "30m",
+                  "1h",
+                  "4h",
+                  "1d"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeframe"
+          }
+        },
+        "required": [
+          "provider",
+          "display_name",
+          "terms_url",
+          "attribution",
+          "mode",
+          "symbol",
+          "market"
+        ],
+        "title": "SourceDescriptor",
+        "type": "object"
+      },
+      "StrategyMetadata": {
+        "additionalProperties": false,
+        "properties": {
+          "default_risk": {
+            "$ref": "#/components/schemas/RiskLimits"
+          },
+          "fails_when": {
+            "title": "Fails When",
+            "type": "string"
+          },
+          "id": {
+            "enum": [
+              "orb",
+              "vwap_mean_reversion",
+              "gap_fade",
+              "donchian_breakout",
+              "rsi_mean_reversion",
+              "custom"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "idea": {
+            "title": "Idea",
+            "type": "string"
+          },
+          "limits": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limits"
+          },
+          "market_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Note"
+          },
+          "markets": {
+            "items": {
+              "enum": [
+                "us_equity",
+                "crypto_24x7"
+              ],
+              "type": "string"
+            },
+            "title": "Markets",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "default": "Results depend on the data, the period, the costs and the parameters you choose. A backtest describes the past; it does not predict future results.",
+            "title": "Note",
+            "type": "string"
+          },
+          "parameters": {
+            "items": {
+              "$ref": "#/components/schemas/ParamDef"
+            },
+            "title": "Parameters",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "timeframes": {
+            "items": {
+              "enum": [
+                "1m",
+                "5m",
+                "15m",
+                "30m",
+                "1h",
+                "4h",
+                "1d"
+              ],
+              "type": "string"
+            },
+            "title": "Timeframes",
+            "type": "array"
+          },
+          "works_when": {
+            "title": "Works When",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "summary",
+          "idea",
+          "works_when",
+          "fails_when",
+          "markets",
+          "timeframes",
+          "parameters",
+          "default_risk"
+        ],
+        "title": "StrategyMetadata",
+        "type": "object"
+      },
+      "SweepAxis": {
+        "additionalProperties": false,
+        "properties": {
+          "chosen": {
+            "title": "Chosen",
+            "type": "number"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "values",
+          "chosen"
+        ],
+        "title": "SweepAxis",
+        "type": "object"
+      },
+      "SweepCell": {
+        "additionalProperties": false,
+        "properties": {
+          "coordinates": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "net_pnl": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Net Pnl"
+          },
+          "profit_factor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Factor"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "invalid",
+              "not_run"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "trade_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trade Count"
+          },
+          "values": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Values",
+            "type": "object"
+          }
+        },
+        "required": [
+          "coordinates",
+          "values",
+          "state",
+          "net_pnl",
+          "profit_factor",
+          "trade_count"
+        ],
+        "title": "SweepCell",
+        "type": "object"
+      },
+      "SweepResult": {
+        "additionalProperties": false,
+        "properties": {
+          "axes": {
+            "items": {
+              "$ref": "#/components/schemas/SweepAxis"
+            },
+            "title": "Axes",
+            "type": "array"
+          },
+          "best": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best"
+          },
+          "best_is_spike": {
+            "title": "Best Is Spike",
+            "type": "boolean"
+          },
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/SweepCell"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "chosen": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Chosen",
+            "type": "array"
+          },
+          "chosen_is_spike": {
+            "title": "Chosen Is Spike",
+            "type": "boolean"
+          },
+          "combinations": {
+            "title": "Combinations",
+            "type": "integer"
+          },
+          "completed": {
+            "title": "Completed",
+            "type": "integer"
+          },
+          "elapsed_seconds": {
+            "title": "Elapsed Seconds",
+            "type": "number"
+          },
+          "neighbour_count": {
+            "title": "Neighbour Count",
+            "type": "integer"
+          },
+          "neighbour_median_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Neighbour Median Share"
+          },
+          "profitable_neighbour_fraction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profitable Neighbour Fraction"
+          },
+          "stopped_by_budget": {
+            "title": "Stopped By Budget",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "axes",
+          "cells",
+          "chosen",
+          "best",
+          "combinations",
+          "completed",
+          "stopped_by_budget",
+          "elapsed_seconds",
+          "neighbour_count",
+          "profitable_neighbour_fraction",
+          "neighbour_median_share",
+          "chosen_is_spike",
+          "best_is_spike"
+        ],
+        "title": "SweepResult",
+        "type": "object"
+      },
+      "Trade": {
+        "additionalProperties": false,
+        "properties": {
+          "bars_held": {
+            "title": "Bars Held",
+            "type": "integer"
+          },
+          "entry_index": {
+            "title": "Entry Index",
+            "type": "integer"
+          },
+          "entry_price": {
+            "title": "Entry Price",
+            "type": "number"
+          },
+          "entry_time": {
+            "format": "date-time",
+            "title": "Entry Time",
+            "type": "string"
+          },
+          "exit_fill": {
+            "enum": [
+              "open",
+              "intrabar",
+              "close"
+            ],
+            "title": "Exit Fill",
+            "type": "string"
+          },
+          "exit_index": {
+            "title": "Exit Index",
+            "type": "integer"
+          },
+          "exit_price": {
+            "title": "Exit Price",
+            "type": "number"
+          },
+          "exit_reason": {
+            "enum": [
+              "stop",
+              "target",
+              "time_exit",
+              "exit_signal",
+              "risk_limit",
+              "end_of_data"
+            ],
+            "title": "Exit Reason",
+            "type": "string"
+          },
+          "exit_session": {
+            "format": "date",
+            "title": "Exit Session",
+            "type": "string"
+          },
+          "exit_time": {
+            "format": "date-time",
+            "title": "Exit Time",
+            "type": "string"
+          },
+          "fees": {
+            "title": "Fees",
+            "type": "number"
+          },
+          "gross_pnl": {
+            "title": "Gross Pnl",
+            "type": "number"
+          },
+          "net_pnl": {
+            "title": "Net Pnl",
+            "type": "number"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "number"
+          },
+          "session": {
+            "format": "date",
+            "title": "Session",
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "long",
+              "short"
+            ],
+            "title": "Side",
+            "type": "string"
+          },
+          "signal_index": {
+            "title": "Signal Index",
+            "type": "integer"
+          },
+          "signal_time": {
+            "format": "date-time",
+            "title": "Signal Time",
+            "type": "string"
+          },
+          "slippage_cost": {
+            "title": "Slippage Cost",
+            "type": "number"
+          },
+          "stop_price": {
+            "title": "Stop Price",
+            "type": "number"
+          },
+          "target_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Price"
+          }
+        },
+        "required": [
+          "side",
+          "signal_index",
+          "entry_index",
+          "exit_index",
+          "signal_time",
+          "entry_time",
+          "exit_time",
+          "exit_fill",
+          "session",
+          "exit_session",
+          "quantity",
+          "entry_price",
+          "exit_price",
+          "stop_price",
+          "target_price",
+          "exit_reason",
+          "gross_pnl",
+          "fees",
+          "slippage_cost",
+          "net_pnl",
+          "bars_held"
+        ],
+        "title": "Trade",
+        "type": "object"
+      },
+      "TradeSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "average_loss": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Loss"
+          },
+          "average_win": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Win"
+          },
+          "expectancy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expectancy"
+          },
+          "longest_losing_streak": {
+            "title": "Longest Losing Streak",
+            "type": "integer"
+          },
+          "net_pnl": {
+            "title": "Net Pnl",
+            "type": "number"
+          },
+          "profit_factor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profit Factor"
+          },
+          "realised_max_drawdown": {
+            "title": "Realised Max Drawdown",
+            "type": "number"
+          },
+          "realised_max_drawdown_pct": {
+            "title": "Realised Max Drawdown Pct",
+            "type": "number"
+          },
+          "return_pct": {
+            "title": "Return Pct",
+            "type": "number"
+          },
+          "trade_count": {
+            "title": "Trade Count",
+            "type": "integer"
+          },
+          "win_rate_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Win Rate Pct"
+          }
+        },
+        "required": [
+          "trade_count",
+          "net_pnl",
+          "return_pct",
+          "win_rate_pct",
+          "average_win",
+          "average_loss",
+          "expectancy",
+          "profit_factor",
+          "longest_losing_streak",
+          "realised_max_drawdown_pct",
+          "realised_max_drawdown"
+        ],
+        "title": "TradeSummary",
+        "type": "object"
+      },
+      "Truncation": {
+        "additionalProperties": false,
+        "properties": {
+          "bars_first_index": {
+            "title": "Bars First Index",
+            "type": "integer"
+          },
+          "bars_returned": {
+            "title": "Bars Returned",
+            "type": "integer"
+          },
+          "bars_total": {
+            "title": "Bars Total",
+            "type": "integer"
+          },
+          "bars_truncated": {
+            "title": "Bars Truncated",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "trades_returned": {
+            "title": "Trades Returned",
+            "type": "integer"
+          },
+          "trades_total": {
+            "title": "Trades Total",
+            "type": "integer"
+          },
+          "trades_truncated": {
+            "title": "Trades Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bars_total",
+          "bars_returned",
+          "bars_first_index",
+          "bars_truncated",
+          "trades_total",
+          "trades_returned",
+          "trades_truncated",
+          "note"
+        ],
+        "title": "Truncation",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VerdictResult": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "CREDIBLE",
+              "FRAGILE",
+              "NOT_CREDIBLE"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/VerdictRule"
+            },
+            "title": "Rules",
+            "type": "array"
+          },
+          "sentence": {
+            "title": "Sentence",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "rule",
+          "sentence",
+          "rules"
+        ],
+        "title": "VerdictResult",
+        "type": "object"
+      },
+      "VerdictRule": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "matched": {
+            "title": "Matched",
+            "type": "boolean"
+          },
+          "verdict": {
+            "enum": [
+              "CREDIBLE",
+              "FRAGILE",
+              "NOT_CREDIBLE"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "verdict",
+          "description",
+          "matched"
+        ],
+        "title": "VerdictRule",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Mycelium Backtest",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/csv/preview": {
+      "post": {
+        "operationId": "preview_csv_api_csv_preview_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "columns": {
+                    "description": "JSON object role -> header",
+                    "type": "string"
+                  },
+                  "file": {
+                    "format": "binary",
+                    "type": "string"
+                  },
+                  "options": {
+                    "description": "JSON",
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsvPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Preview Csv"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/limits": {
+      "get": {
+        "operationId": "limits_api_limits_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LimitsDocument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Limits"
+      }
+    },
+    "/api/markets": {
+      "get": {
+        "operationId": "markets_api_markets_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarketsDocument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Markets"
+      }
+    },
+    "/api/runs": {
+      "post": {
+        "operationId": "create_run_api_runs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Create Run"
+      }
+    },
+    "/api/runs/csv": {
+      "post": {
+        "operationId": "create_csv_run_api_runs_csv_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "columns": {
+                    "description": "JSON object role -> header",
+                    "type": "string"
+                  },
+                  "file": {
+                    "format": "binary",
+                    "type": "string"
+                  },
+                  "options": {
+                    "description": "JSON",
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunCreated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Create Csv Run"
+      }
+    },
+    "/api/runs/{run_id}": {
+      "delete": {
+        "operationId": "cancel_run_api_runs__run_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStatusDocument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Cancel Run"
+      },
+      "get": {
+        "operationId": "run_status_api_runs__run_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunStatusDocument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Run Status"
+      }
+    },
+    "/api/runs/{run_id}/events": {
+      "get": {
+        "operationId": "run_events_api_runs__run_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 1000000,
+                  "minimum": -1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "After"
+            }
+          },
+          {
+            "in": "header",
+            "name": "last-event-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Last-Event-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {}
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Run Events"
+      }
+    },
+    "/api/runs/{run_id}/result": {
+      "get": {
+        "operationId": "run_result_api_runs__run_id__result_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunResultPayload"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Gateway Timeout"
+          }
+        },
+        "summary": "Run Result"
+      }
+    },
+    "/api/strategies": {
+      "get": {
+        "operationId": "strategies_api_strategies_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryDocument"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Strategies"
+      }
+    },
+    "/api/strategies/{strategy_id}": {
+      "get": {
+        "operationId": "strategy_api_strategies__strategy_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "strategy_id",
+            "required": true,
+            "schema": {
+              "title": "Strategy Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StrategyMetadata"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Strategy"
+      }
+    }
+  }
+}

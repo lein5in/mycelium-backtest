@@ -1,4 +1,6 @@
-export const RUN_EVENTS_SCHEMA_VERSION = 1
+export const RUN_EVENTS_SCHEMA_VERSION = 2
+export const SUPPORTED_SCHEMA_VERSIONS = [1, 2] as const
+export type SchemaVersion = (typeof SUPPORTED_SCHEMA_VERSIONS)[number]
 
 export const STAGES = ['DATA', 'SIGNALS', 'SIMULATOR', 'COSTS', 'AUDITOR', 'REPORTER'] as const
 export type Stage = (typeof STAGES)[number]
@@ -20,7 +22,7 @@ export const VERDICTS = ['CREDIBLE', 'FRAGILE', 'NOT_CREDIBLE'] as const
 export type Verdict = (typeof VERDICTS)[number]
 
 type Envelope = {
-  schema_version: typeof RUN_EVENTS_SCHEMA_VERSION
+  schema_version: SchemaVersion
   run_id: string
   seq: number
   ts: string
@@ -56,7 +58,12 @@ export type CheckDone = Envelope & {
   figure: string
 }
 export type RunDone = Envelope & { type: 'run_done'; verdict: Verdict }
-export type RunFailed = Envelope & { type: 'run_failed'; stage: Stage; message: string }
+export type RunFailed = Envelope & {
+  type: 'run_failed'
+  stage: Stage
+  message: string
+  code?: string | null
+}
 
 export type RunEvent =
   | RunStarted
@@ -114,14 +121,17 @@ const bodyChecks: Record<RunEvent['type'], (event: Fields) => boolean> = {
     isOneOf(CHECK_STATUSES, e.status) &&
     typeof e.figure === 'string',
   run_done: (e) => isOneOf(VERDICTS, e.verdict),
-  run_failed: (e) => isOneOf(STAGES, e.stage) && typeof e.message === 'string',
+  run_failed: (e) =>
+    isOneOf(STAGES, e.stage) &&
+    typeof e.message === 'string' &&
+    (e.code === undefined || isOptionalString(e.code)),
 }
 
 const eventTypes = Object.keys(bodyChecks) as RunEvent['type'][]
 
 export function isRunEvent(value: unknown): value is RunEvent {
   if (!isObject(value)) return false
-  if (value.schema_version !== RUN_EVENTS_SCHEMA_VERSION) return false
+  if (!(SUPPORTED_SCHEMA_VERSIONS as readonly unknown[]).includes(value.schema_version)) return false
   if (typeof value.run_id !== 'string' || value.run_id.length === 0) return false
   if (!isNonNegativeInt(value.seq)) return false
   if (typeof value.ts !== 'string' || Number.isNaN(Date.parse(value.ts))) return false

@@ -1,0 +1,15 @@
+{
+  "code": "range_too_large",
+  "status": 400,
+  "message": "5m data is limited to 730 days per run; choose a shorter range.",
+  "stage": null,
+  "details": {
+    "problems": [
+      {
+        "field": "data.end",
+        "message": "5m data is limited to 730 days per run; choose a shorter range."
+      }
+    ]
+  },
+  "request_id": "78303409382d4b6f"
+}

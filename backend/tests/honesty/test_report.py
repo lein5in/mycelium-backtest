@@ -40,6 +40,8 @@ def checks(**overrides):
         ({}, "CREDIBLE", "credible"),
         ({"robustness": "WARN"}, "CREDIBLE", "credible"),
         ({"robustness": "WARN", "out_of_sample": "WARN"}, "FRAGILE", "otherwise"),
+        ({"out_of_sample": "WARN"}, "FRAGILE", "otherwise"),
+        ({"costs": "WARN"}, "CREDIBLE", "credible"),
         ({"costs": "FAIL"}, "NOT_CREDIBLE", "costs_fail"),
         ({"versus_random": "FAIL"}, "NOT_CREDIBLE", "random_fail"),
         ({"trade_count": "FAIL"}, "NOT_CREDIBLE", "trade_count_fail"),

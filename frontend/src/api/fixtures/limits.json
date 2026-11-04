@@ -1,0 +1,41 @@
+{
+  "range_days": {
+    "coinbase": {
+      "1m": 30.0,
+      "5m": 180.0,
+      "15m": 365.0,
+      "1h": 730.0,
+      "1d": 1825.0
+    },
+    "kraken": {
+      "1m": 30.0,
+      "5m": 180.0,
+      "15m": 365.0,
+      "30m": 365.0,
+      "1h": 730.0,
+      "4h": 1825.0,
+      "1d": 1825.0
+    },
+    "samples": {
+      "1m": 90.0,
+      "5m": 730.0
+    }
+  },
+  "csv_max_bytes": 10485760,
+  "csv_max_rows": 500000,
+  "json_max_bytes": 65536,
+  "max_parameters": 32,
+  "random_draws": {
+    "minimum": 100,
+    "maximum": 5000,
+    "default": 1000
+  },
+  "sweep_max_combinations": 400,
+  "sweep_values_per_parameter": 5,
+  "run_timeout_seconds": 120.0,
+  "retention_minutes": 30.0,
+  "runs_per_hour_per_ip": 1000,
+  "concurrent_runs_per_ip": 100,
+  "max_result_bars": 60000,
+  "max_result_trades": 5000
+}

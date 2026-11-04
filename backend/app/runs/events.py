@@ -3,7 +3,9 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
-SCHEMA_VERSION = 1
+from app.error_codes import ErrorCode
+
+SCHEMA_VERSION = 2
 
 Stage = Literal["DATA", "SIGNALS", "SIMULATOR", "COSTS", "AUDITOR", "REPORTER"]
 STAGES: tuple[Stage, ...] = ("DATA", "SIGNALS", "SIMULATOR", "COSTS", "AUDITOR", "REPORTER")
@@ -34,7 +36,7 @@ Detail = Annotated[str, Field(max_length=120)]
 class EventEnvelope(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    schema_version: Literal[1] = SCHEMA_VERSION
+    schema_version: Literal[2] = SCHEMA_VERSION
     run_id: Annotated[str, Field(min_length=1, max_length=64)]
     seq: Annotated[int, Field(ge=0)]
     ts: datetime
@@ -104,6 +106,7 @@ class RunFailed(EventEnvelope):
     type: Literal["run_failed"] = "run_failed"
     stage: Stage
     message: Annotated[str, Field(min_length=1, max_length=200)]
+    code: ErrorCode | None = None
 
 
 RunEvent = Annotated[

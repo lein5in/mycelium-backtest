@@ -28,7 +28,7 @@ def test_schema_rejects_unknown_event_type() -> None:
     validator = Draft202012Validator(schema)
     bogus = {
         "type": "teleport",
-        "schema_version": 1,
+        "schema_version": 2,
         "run_id": "x",
         "seq": 0,
         "ts": "2026-01-01T00:00:00Z",

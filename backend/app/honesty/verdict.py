@@ -11,8 +11,8 @@ LABELS: dict[Verdict, str] = {
 }
 SENTENCE = (
     "Not credible if the costs, random-entry or trade-count check fails, or if two or more "
-    "checks fail. Credible only if no check fails, at most one warns, the random-entry check "
-    "passes and no check lacks data. Fragile otherwise."
+    "checks fail. Credible only if no check fails, at most one warns, the out-of-sample and "
+    "random-entry checks pass and no check lacks data. Fragile otherwise."
 )
 
 Predicate = Callable[[dict[str, CheckResult]], bool]
@@ -62,10 +62,12 @@ RULES: tuple[Rule, ...] = (
     Rule(
         "credible",
         "CREDIBLE",
-        "No check fails, at most one warns, the random-entry check passes and no check lacks data.",
+        "No check fails, at most one warns, the out-of-sample and random-entry checks pass and "
+        "no check lacks data.",
         lambda c: (
             _fails(c) == 0
             and _warns(c) <= 1
+            and c["out_of_sample"].status == "PASS"
             and c["versus_random"].status == "PASS"
             and not any(check.insufficient_data for check in c.values())
         ),

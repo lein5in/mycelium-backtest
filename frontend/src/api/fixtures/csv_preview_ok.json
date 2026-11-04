@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "report": {
+    "rows": 156,
+    "columns": [
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "note_x"
+    ],
+    "delimiter": ",",
+    "mapping": {
+      "timestamp": "timestamp",
+      "open": "open",
+      "high": "high",
+      "low": "low",
+      "close": "close",
+      "volume": "volume"
+    },
+    "timestamp_format": "iso_with_offset",
+    "timezone": "UTC",
+    "timeframe": "5m",
+    "problems": [],
+    "problem_count": 0,
+    "warnings": [],
+    "gaps": {
+      "missing_bars": 0,
+      "gap_count": 0,
+      "gaps": [],
+      "note": "Missing bars are compared with the NYSE calendar; no bar is invented."
+    },
+    "rules": [
+      "Timestamps are bar open times.",
+      "Numbers without a time zone offset are read as epoch time: seconds, milliseconds or microseconds, chosen by size.",
+      "Text timestamps without an offset are read in the time zone you declare; without a declared time zone the import stops and asks for one.",
+      "A repeated local hour when clocks go back is resolved from the order of the rows (first pass daylight time, second pass standard time); if the order does not tell, the first occurrence is used and a warning says so.",
+      "A local time that does not exist because clocks moved forward is an error.",
+      "A file sorted newest first is reversed, with a warning; any other disorder is an error."
+    ]
+  },
+  "bar_count": 156,
+  "timeframe": "5m",
+  "start": "2024-01-02T14:30:00Z",
+  "end": "2024-01-03T20:55:00Z",
+  "source": {
+    "provider": "user_csv",
+    "display_name": "Your CSV file",
+    "terms_url": null,
+    "attribution": "Your own CSV file, processed in memory and not stored.",
+    "mode": "USER CSV",
+    "symbol": "CSV",
+    "market": "us_equity",
+    "timeframe": "5m",
+    "start": "2024-01-02T14:30:00Z",
+    "end": "2024-01-03T20:55:00Z"
+  },
+  "note": "The file is processed in memory to produce this preview and is not kept."
+}

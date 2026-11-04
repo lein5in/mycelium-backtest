@@ -1,0 +1,64 @@
+{
+  "ok": false,
+  "report": {
+    "rows": 156,
+    "columns": [
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "note_x"
+    ],
+    "delimiter": ",",
+    "mapping": {
+      "timestamp": "timestamp",
+      "open": "open",
+      "high": "high",
+      "low": "low",
+      "close": "close",
+      "volume": "volume"
+    },
+    "timestamp_format": "iso_with_offset",
+    "timezone": "UTC",
+    "timeframe": null,
+    "problems": [
+      {
+        "line": 7,
+        "column": "open",
+        "code": "not_a_number",
+        "message": "open is empty or not a number"
+      },
+      {
+        "line": 11,
+        "column": "open",
+        "code": "not_a_number",
+        "message": "open is empty or not a number"
+      },
+      {
+        "line": 14,
+        "column": null,
+        "code": "non_positive_price",
+        "message": "prices must be positive"
+      }
+    ],
+    "problem_count": 3,
+    "warnings": [],
+    "gaps": null,
+    "rules": [
+      "Timestamps are bar open times.",
+      "Numbers without a time zone offset are read as epoch time: seconds, milliseconds or microseconds, chosen by size.",
+      "Text timestamps without an offset are read in the time zone you declare; without a declared time zone the import stops and asks for one.",
+      "A repeated local hour when clocks go back is resolved from the order of the rows (first pass daylight time, second pass standard time); if the order does not tell, the first occurrence is used and a warning says so.",
+      "A local time that does not exist because clocks moved forward is an error.",
+      "A file sorted newest first is reversed, with a warning; any other disorder is an error."
+    ]
+  },
+  "bar_count": null,
+  "timeframe": null,
+  "start": null,
+  "end": null,
+  "source": null,
+  "note": "The file is processed in memory to produce this preview and is not kept."
+}

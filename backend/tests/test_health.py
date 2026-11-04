@@ -8,7 +8,7 @@ def test_health_returns_ok() -> None:
     client = TestClient(create_app())
     response = client.get("/api/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
+    assert response.json() == {"status": "ok", "version": "0.1.0"}
 
 
 def test_cors_origins_come_from_settings() -> None:

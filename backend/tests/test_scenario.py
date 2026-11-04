@@ -101,4 +101,4 @@ def test_seq_strictly_increasing_and_timestamps_monotonic(scenario: Scenario) ->
     assert seqs == list(range(len(events)))
     stamps = [event.ts for event in events]
     assert stamps == sorted(stamps)
-    assert all(event.run_id == "r1" and event.schema_version == 1 for event in events)
+    assert all(event.run_id == "r1" and event.schema_version == 2 for event in events)

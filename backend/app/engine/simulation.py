@@ -11,6 +11,7 @@ from app.engine.sessions import SessionMap
 from app.engine.signals import SidePlan, SignalPlan
 
 ProgressCallback = Callable[[str, int, int | None], None]
+ClosedTradesCallback = Callable[[list["TradeRecord"]], None]
 LONG = 1
 SHORT = -1
 
@@ -84,6 +85,7 @@ def simulate(
     plan: SignalPlan,
     config: BacktestConfig,
     progress: ProgressCallback | None = None,
+    closed_trades: ClosedTradesCallback | None = None,
 ) -> SimulationOutput:
     size = bars.size
     opens = bars.open.tolist()
@@ -133,6 +135,13 @@ def simulate(
     signals = 0
     entries = 0
     report_every = max(1, size // 100)
+    delivered = 0
+
+    def deliver() -> None:
+        nonlocal delivered
+        if closed_trades is not None and len(trades) > delivered:
+            closed_trades(trades[delivered:])
+            delivered = len(trades)
 
     def close_position(index: int, reference: float, reason: str, fill_point: str) -> None:
         nonlocal realised, position, pending_exit
@@ -336,13 +345,16 @@ def simulate(
             else:
                 skipped[reason] += 1
 
-        if progress is not None and j % report_every == 0:
-            progress("SIMULATOR", int(100 * j / size), j)
+        if j % report_every == 0:
+            deliver()
+            if progress is not None:
+                progress("SIMULATOR", int(100 * j / size), j)
 
         if halted is not None and position is None and pending_entry is None:
             equity[j + 1 :] = marked
             break
 
+    deliver()
     if progress is not None:
         progress("SIMULATOR", 100, size - 1)
     return SimulationOutput(

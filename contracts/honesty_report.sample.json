@@ -157,7 +157,7 @@
     "id": "NOT_CREDIBLE",
     "label": "Not credible",
     "rule": "costs_fail",
-    "sentence": "Not credible if the costs, random-entry or trade-count check fails, or if two or more checks fail. Credible only if no check fails, at most one warns, the random-entry check passes and no check lacks data. Fragile otherwise.",
+    "sentence": "Not credible if the costs, random-entry or trade-count check fails, or if two or more checks fail. Credible only if no check fails, at most one warns, the out-of-sample and random-entry checks pass and no check lacks data. Fragile otherwise.",
     "rules": [
       {
         "id": "costs_fail",
@@ -186,7 +186,7 @@
       {
         "id": "credible",
         "verdict": "CREDIBLE",
-        "description": "No check fails, at most one warns, the random-entry check passes and no check lacks data.",
+        "description": "No check fails, at most one warns, the out-of-sample and random-entry checks pass and no check lacks data.",
         "matched": false
       },
       {

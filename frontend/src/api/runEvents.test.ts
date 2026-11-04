@@ -22,7 +22,7 @@ describe('run event contract', () => {
 
   it('rejects malformed events', () => {
     const base = sample[0]
-    expect(isRunEvent({ ...base, schema_version: 2 })).toBe(false)
+    expect(isRunEvent({ ...base, schema_version: 3 })).toBe(false)
     expect(isRunEvent({ ...base, type: 'teleport' })).toBe(false)
     expect(isRunEvent({ ...base, seq: -1 })).toBe(false)
     expect(isRunEvent({ ...base, ts: 'not a date' })).toBe(false)

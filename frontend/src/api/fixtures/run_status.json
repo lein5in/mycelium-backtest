@@ -1,0 +1,13 @@
+{
+  "run_id": "eb13247abeac448198c25699334c8713",
+  "status": "done",
+  "stage": "REPORTER",
+  "verdict": "NOT_CREDIBLE",
+  "created_at": "2026-11-04T02:40:24.264988Z",
+  "started_at": "2026-11-04T02:40:24.264988Z",
+  "finished_at": "2026-11-04T02:40:31.399119Z",
+  "events": 87,
+  "error": null,
+  "events_url": "/api/runs/eb13247abeac448198c25699334c8713/events",
+  "result_url": "/api/runs/eb13247abeac448198c25699334c8713/result"
+}

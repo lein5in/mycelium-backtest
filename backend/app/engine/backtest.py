@@ -10,7 +10,12 @@ from app.engine.models import BacktestConfig, FixedFraction
 from app.engine.results import Diagnostics, Halt, RunResult, Trade
 from app.engine.sessions import NS_PER_DAY, NS_PER_MINUTE, SessionMap, map_sessions
 from app.engine.signals import SignalPlan, compile_spec
-from app.engine.simulation import ProgressCallback, SimulationOutput, simulate
+from app.engine.simulation import (
+    ClosedTradesCallback,
+    ProgressCallback,
+    SimulationOutput,
+    simulate,
+)
 from app.engine.spec import StrategySpec
 
 EXAMPLE_LIMIT = 5
@@ -147,10 +152,11 @@ def run_plan(
     strategy_name: str,
     sessions: SessionMap | None = None,
     progress: ProgressCallback | None = None,
+    closed_trades: ClosedTradesCallback | None = None,
 ) -> BacktestOutput:
     if sessions is None:
         sessions = prepare_sessions(bars, config)
-    output = simulate(bars, sessions, plan, config, progress)
+    output = simulate(bars, sessions, plan, config, progress, closed_trades)
     _emit(progress, "REPORTER", 0)
     trades = _trades(bars, sessions, output)
     labels = pd.DatetimeIndex(sessions.label_ns.astype("datetime64[ns]")).date.tolist()

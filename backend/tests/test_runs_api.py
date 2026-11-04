@@ -36,15 +36,15 @@ def parse_stream(text: str) -> tuple[list[dict], list[str]]:
 
 
 def create(client: TestClient, **body: object) -> str:
-    response = client.post("/api/runs", json=body or None)
+    response = client.post("/api/dev/fake-runs", json=body or None)
     assert response.status_code == 201
     payload = response.json()
-    assert payload["events_url"] == f"/api/runs/{payload['run_id']}/events"
+    assert payload["events_url"] == f"/api/dev/fake-runs/{payload['run_id']}/events"
     return payload["run_id"]
 
 
 def test_create_run_without_body_defaults_to_success(client: TestClient) -> None:
-    response = client.post("/api/runs")
+    response = client.post("/api/dev/fake-runs")
     assert response.status_code == 201
     run_id = response.json()["run_id"]
     registry = client.app.state.run_registry
@@ -58,25 +58,25 @@ def test_create_run_without_body_defaults_to_success(client: TestClient) -> None
     [{"scenario": "explode"}, {"speed": 0}, {"speed": -1}, {"speed": 5000}, {"extra": 1}],
 )
 def test_create_run_rejects_invalid_input(client: TestClient, body: dict) -> None:
-    assert client.post("/api/runs", json=body).status_code == 422
+    assert client.post("/api/dev/fake-runs", json=body).status_code == 400
 
 
 def test_unknown_run_gives_404(client: TestClient) -> None:
-    assert client.get("/api/runs/does-not-exist/events").status_code == 404
+    assert client.get("/api/dev/fake-runs/does-not-exist/events").status_code == 404
 
 
 def test_stream_headers(client: TestClient) -> None:
     run_id = create(client, speed=1000)
-    response = client.get(f"/api/runs/{run_id}/events")
+    response = client.get(f"/api/dev/fake-runs/{run_id}/events")
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/event-stream")
-    assert "no-cache" in response.headers["cache-control"]
+    assert "no-store" in response.headers["cache-control"]
     assert response.headers["x-accel-buffering"] == "no"
 
 
 def test_success_stream_is_complete_and_valid(client: TestClient) -> None:
     run_id = create(client, speed=1000)
-    events, _ = parse_stream(client.get(f"/api/runs/{run_id}/events").text)
+    events, _ = parse_stream(client.get(f"/api/dev/fake-runs/{run_id}/events").text)
     expected = [step.payload["type"] for step in scripted_steps(Scenario.SUCCESS)]
     assert [event["type"] for event in events] == expected
     assert [event["seq"] for event in events] == list(range(len(events)))
@@ -88,7 +88,7 @@ def test_success_stream_is_complete_and_valid(client: TestClient) -> None:
 
 def test_failure_stream_ends_with_run_failed(client: TestClient) -> None:
     run_id = create(client, scenario="failure", speed=1000)
-    events, _ = parse_stream(client.get(f"/api/runs/{run_id}/events").text)
+    events, _ = parse_stream(client.get(f"/api/dev/fake-runs/{run_id}/events").text)
     types = [event["type"] for event in events]
     assert types[-1] == "run_failed"
     assert "run_done" not in types
@@ -97,11 +97,11 @@ def test_failure_stream_ends_with_run_failed(client: TestClient) -> None:
 def test_speed_factor_changes_wall_time(client: TestClient) -> None:
     fast_id = create(client, speed=1000)
     started = time.perf_counter()
-    client.get(f"/api/runs/{fast_id}/events")
+    client.get(f"/api/dev/fake-runs/{fast_id}/events")
     fast = time.perf_counter() - started
     slow_id = create(client, speed=20)
     started = time.perf_counter()
-    client.get(f"/api/runs/{slow_id}/events")
+    client.get(f"/api/dev/fake-runs/{slow_id}/events")
     slow = time.perf_counter() - started
     total = sum(step.delay for step in scripted_steps(Scenario.SUCCESS))
     assert fast < 0.5
@@ -112,7 +112,7 @@ def test_speed_factor_changes_wall_time(client: TestClient) -> None:
 def test_heartbeat_comments_while_idle() -> None:
     client = TestClient(create_app(Settings(heartbeat_seconds=0.01)))
     run_id = create(client, speed=10)
-    events, comments = parse_stream(client.get(f"/api/runs/{run_id}/events").text)
+    events, comments = parse_stream(client.get(f"/api/dev/fake-runs/{run_id}/events").text)
     assert comments
     assert all(comment == HEARTBEAT.strip() for comment in comments)
     assert events[-1]["type"] == "run_done"

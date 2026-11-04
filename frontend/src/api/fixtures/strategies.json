@@ -1,0 +1,549 @@
+{
+  "schema_version": 1,
+  "strategies": [
+    {
+      "schema_version": 1,
+      "id": "orb",
+      "name": "Opening Range Breakout",
+      "summary": "Trades the first close outside the range set in the first minutes of the session.",
+      "idea": "The first part of a session often sets the high and low that the rest of the day reacts to. When price closes beyond that range, the strategy follows the move, with the stop on the other side of the range and an exit at the end of the session.",
+      "works_when": "Sessions with a clear direction after the open, such as news days or strong trends, where a breakout keeps going instead of reversing.",
+      "fails_when": "Range-bound or choppy sessions where price pokes out of the range and comes back, and very wide ranges that put the stop far away.",
+      "markets": [
+        "us_equity",
+        "crypto_24x7"
+      ],
+      "market_note": null,
+      "timeframes": [
+        "1m",
+        "5m",
+        "15m"
+      ],
+      "parameters": [
+        {
+          "name": "range_minutes",
+          "label": "Opening range",
+          "type": "int",
+          "default": 30,
+          "minimum": 5.0,
+          "maximum": 240.0,
+          "step": 5.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "minutes",
+          "description": "Length of the opening range from the session open (crypto: from the session anchor)."
+        },
+        {
+          "name": "min_range_atr",
+          "label": "Minimum range",
+          "type": "float",
+          "default": 0.5,
+          "minimum": 0.0,
+          "maximum": 5.0,
+          "step": 0.1,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "x ATR(14)",
+          "description": "Skip sessions whose range is narrower than this multiple of ATR(14); 0 disables."
+        },
+        {
+          "name": "target_r",
+          "label": "Target",
+          "type": "float",
+          "default": 1.5,
+          "minimum": 0.0,
+          "maximum": 10.0,
+          "step": 0.25,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "R",
+          "description": "Target distance as a multiple of the stop distance (R); 0 means no target."
+        },
+        {
+          "name": "directions",
+          "label": "Directions",
+          "type": "choice",
+          "default": "both",
+          "minimum": null,
+          "maximum": null,
+          "step": null,
+          "choices": [
+            "long",
+            "short",
+            "both"
+          ],
+          "market_defaults": null,
+          "unit": null,
+          "description": "Which trades are allowed: long only, short only, or both."
+        }
+      ],
+      "default_risk": {
+        "max_session_loss_pct": null,
+        "max_drawdown_pct": null,
+        "max_trades_per_session": 1
+      },
+      "limits": null,
+      "note": "Results depend on the data, the period, the costs and the parameters you choose. A backtest describes the past; it does not predict future results."
+    },
+    {
+      "schema_version": 1,
+      "id": "vwap_mean_reversion",
+      "name": "VWAP Mean Reversion",
+      "summary": "Fades stretched moves away from the session VWAP and targets a return to it.",
+      "idea": "The volume-weighted average price of the session is where most of the day's volume traded. When the close moves unusually far from it, measured in standard deviations of recent distances, the strategy bets on a move back toward the VWAP, which is also the moving target.",
+      "works_when": "Calm, two-sided sessions where price oscillates around a stable VWAP and stretched moves are driven by short-lived order imbalances.",
+      "fails_when": "Trend days and news-driven sessions, where price keeps moving away from the VWAP and the stretch is the start of a move rather than its end.",
+      "markets": [
+        "us_equity",
+        "crypto_24x7"
+      ],
+      "market_note": null,
+      "timeframes": [
+        "1m",
+        "5m",
+        "15m"
+      ],
+      "parameters": [
+        {
+          "name": "threshold_std",
+          "label": "Deviation threshold",
+          "type": "float",
+          "default": 2.0,
+          "minimum": 0.5,
+          "maximum": 5.0,
+          "step": 0.1,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "std",
+          "description": "Enter when the close is this many standard deviations away from the session VWAP."
+        },
+        {
+          "name": "stop_atr",
+          "label": "Stop distance",
+          "type": "float",
+          "default": 1.5,
+          "minimum": 0.25,
+          "maximum": 10.0,
+          "step": 0.25,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "x ATR(14)",
+          "description": "Stop distance from the entry as a multiple of ATR(14)."
+        },
+        {
+          "name": "skip_minutes",
+          "label": "Skip after open",
+          "type": "int",
+          "default": 30,
+          "minimum": 0.0,
+          "maximum": 240.0,
+          "step": 5.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "minutes",
+          "description": "No entries during the first minutes of the session, while the VWAP is still unstable."
+        },
+        {
+          "name": "std_window",
+          "label": "Deviation window",
+          "type": "int",
+          "default": 30,
+          "minimum": 5.0,
+          "maximum": 500.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "bars",
+          "description": "Number of bars used for the standard deviation of the distance to the VWAP."
+        },
+        {
+          "name": "directions",
+          "label": "Directions",
+          "type": "choice",
+          "default": "both",
+          "minimum": null,
+          "maximum": null,
+          "step": null,
+          "choices": [
+            "long",
+            "short",
+            "both"
+          ],
+          "market_defaults": null,
+          "unit": null,
+          "description": "Which trades are allowed: long only, short only, or both."
+        }
+      ],
+      "default_risk": {
+        "max_session_loss_pct": null,
+        "max_drawdown_pct": null,
+        "max_trades_per_session": 1
+      },
+      "limits": null,
+      "note": "Results depend on the data, the period, the costs and the parameters you choose. A backtest describes the past; it does not predict future results."
+    },
+    {
+      "schema_version": 1,
+      "id": "gap_fade",
+      "name": "Gap Fade",
+      "summary": "Fades a moderate opening gap back toward the previous session's close.",
+      "idea": "When a stock opens away from the previous close and the first bar does not close the gap, the strategy trades back toward that close. The target is the previous close, the stop sits beyond the first bar's extreme, and very large gaps are skipped because they usually follow news.",
+      "works_when": "Gaps caused by overnight noise or thin pre-market trading, without fresh information, in liquid stocks and ETFs.",
+      "fails_when": "Gaps driven by earnings, guidance or macro news, which tend to extend rather than fill, and very volatile opens that run through the stop.",
+      "markets": [
+        "us_equity"
+      ],
+      "market_note": "Gap Fade needs a session close and a separate next open; crypto trades 24/7, so there is no overnight gap to fade.",
+      "timeframes": [
+        "1m",
+        "5m",
+        "15m",
+        "30m"
+      ],
+      "parameters": [
+        {
+          "name": "min_gap_pct",
+          "label": "Minimum gap",
+          "type": "float",
+          "default": 0.5,
+          "minimum": 0.1,
+          "maximum": 10.0,
+          "step": 0.1,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "% of previous close",
+          "description": "Smallest gap between the session open and the previous session close."
+        },
+        {
+          "name": "max_gap_pct",
+          "label": "Maximum gap",
+          "type": "float",
+          "default": 5.0,
+          "minimum": 0.5,
+          "maximum": 20.0,
+          "step": 0.1,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "% of previous close",
+          "description": "Larger gaps are usually news-driven and are skipped."
+        },
+        {
+          "name": "stop_gap_fraction",
+          "label": "Stop beyond first bar",
+          "type": "float",
+          "default": 0.5,
+          "minimum": 0.1,
+          "maximum": 3.0,
+          "step": 0.1,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "x gap",
+          "description": "Stop placed beyond the first bar's extreme by this fraction of the gap size."
+        },
+        {
+          "name": "directions",
+          "label": "Directions",
+          "type": "choice",
+          "default": "both",
+          "minimum": null,
+          "maximum": null,
+          "step": null,
+          "choices": [
+            "long",
+            "short",
+            "both"
+          ],
+          "market_defaults": null,
+          "unit": null,
+          "description": "Which trades are allowed: long only, short only, or both."
+        }
+      ],
+      "default_risk": {
+        "max_session_loss_pct": null,
+        "max_drawdown_pct": null,
+        "max_trades_per_session": 1
+      },
+      "limits": null,
+      "note": "Results depend on the data, the period, the costs and the parameters you choose. A backtest describes the past; it does not predict future results."
+    },
+    {
+      "schema_version": 1,
+      "id": "donchian_breakout",
+      "name": "Donchian Channel Breakout",
+      "summary": "Follows a close beyond the highest high or lowest low of the previous N bars.",
+      "idea": "A classic trend-following rule: a close above the highest high of the last N bars (or below the lowest low) suggests a new move. The channel never includes the current bar. The position exits on the stop or when price closes beyond a shorter channel on the other side.",
+      "works_when": "Markets with long, persistent trends where breakouts are followed by extended moves that pay for many small losing trades.",
+      "fails_when": "Sideways markets with frequent false breakouts, and sharp reversals right after a new high or low.",
+      "markets": [
+        "us_equity",
+        "crypto_24x7"
+      ],
+      "market_note": null,
+      "timeframes": [
+        "15m",
+        "30m",
+        "1h",
+        "4h",
+        "1d"
+      ],
+      "parameters": [
+        {
+          "name": "entry_lookback",
+          "label": "Entry channel",
+          "type": "int",
+          "default": 20,
+          "minimum": 2.0,
+          "maximum": 500.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "bars",
+          "description": "Enter on a close beyond the highest high or lowest low of the previous N bars."
+        },
+        {
+          "name": "stop_atr",
+          "label": "Stop distance",
+          "type": "float",
+          "default": 2.0,
+          "minimum": 0.25,
+          "maximum": 10.0,
+          "step": 0.25,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "x ATR(14)",
+          "description": "Stop distance from the entry as a multiple of ATR(14)."
+        },
+        {
+          "name": "exit_lookback",
+          "label": "Exit channel",
+          "type": "int",
+          "default": 10,
+          "minimum": 0.0,
+          "maximum": 500.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "bars",
+          "description": "Exit on a close beyond the opposite channel of the previous N bars; 0 disables."
+        },
+        {
+          "name": "max_bars",
+          "label": "Maximum bars held",
+          "type": "int",
+          "default": 0,
+          "minimum": 0.0,
+          "maximum": 1000.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "bars",
+          "description": "Exit at the close after this many bars in the trade; 0 disables."
+        },
+        {
+          "name": "directions",
+          "label": "Directions",
+          "type": "choice",
+          "default": "both",
+          "minimum": null,
+          "maximum": null,
+          "step": null,
+          "choices": [
+            "long",
+            "short",
+            "both"
+          ],
+          "market_defaults": null,
+          "unit": null,
+          "description": "Which trades are allowed: long only, short only, or both."
+        }
+      ],
+      "default_risk": {
+        "max_session_loss_pct": null,
+        "max_drawdown_pct": null,
+        "max_trades_per_session": 1
+      },
+      "limits": null,
+      "note": "Results depend on the data, the period, the costs and the parameters you choose. A backtest describes the past; it does not predict future results."
+    },
+    {
+      "schema_version": 1,
+      "id": "rsi_mean_reversion",
+      "name": "RSI Mean Reversion",
+      "summary": "Buys oversold pullbacks in an uptrend and sells overbought rallies in a downtrend.",
+      "idea": "The relative strength index measures how one-sided recent closes were. When it crosses back from an extreme while price is on the right side of a long moving average, the strategy bets that the pullback is over. It exits when the RSI returns to a middle level, on the stop, or after a maximum number of bars.",
+      "works_when": "Steady trends with regular, shallow pullbacks, where extremes in the RSI are temporary and the trend resumes.",
+      "fails_when": "Trend reversals and crashes, where oversold becomes more oversold, and flat markets where the trend filter flips back and forth.",
+      "markets": [
+        "us_equity",
+        "crypto_24x7"
+      ],
+      "market_note": null,
+      "timeframes": [
+        "15m",
+        "30m",
+        "1h",
+        "4h",
+        "1d"
+      ],
+      "parameters": [
+        {
+          "name": "rsi_period",
+          "label": "RSI period",
+          "type": "int",
+          "default": 14,
+          "minimum": 2.0,
+          "maximum": 100.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "bars",
+          "description": "Number of bars of the RSI."
+        },
+        {
+          "name": "oversold",
+          "label": "Oversold level",
+          "type": "int",
+          "default": 30,
+          "minimum": 5.0,
+          "maximum": 50.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": null,
+          "description": "A long needs the RSI to cross back above this level."
+        },
+        {
+          "name": "overbought",
+          "label": "Overbought level",
+          "type": "int",
+          "default": 70,
+          "minimum": 50.0,
+          "maximum": 95.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": null,
+          "description": "A short needs the RSI to cross back below this level."
+        },
+        {
+          "name": "trend_sma",
+          "label": "Trend filter",
+          "type": "int",
+          "default": 200,
+          "minimum": 0.0,
+          "maximum": 500.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "bars",
+          "description": "Longs only above, shorts only below the simple moving average of this length; 0 disables the filter."
+        },
+        {
+          "name": "exit_rsi",
+          "label": "Exit RSI level",
+          "type": "int",
+          "default": 50,
+          "minimum": 5.0,
+          "maximum": 95.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": null,
+          "description": "Exit at the next open once the RSI reaches this level at a close."
+        },
+        {
+          "name": "stop_atr",
+          "label": "Stop distance",
+          "type": "float",
+          "default": 2.0,
+          "minimum": 0.25,
+          "maximum": 10.0,
+          "step": 0.25,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "x ATR(14)",
+          "description": "Stop distance from the entry as a multiple of ATR(14)."
+        },
+        {
+          "name": "max_bars",
+          "label": "Maximum bars held",
+          "type": "int",
+          "default": 10,
+          "minimum": 1.0,
+          "maximum": 500.0,
+          "step": 1.0,
+          "choices": null,
+          "market_defaults": null,
+          "unit": "bars",
+          "description": "Exit at the close after this many bars in the trade."
+        },
+        {
+          "name": "directions",
+          "label": "Directions",
+          "type": "choice",
+          "default": "long",
+          "minimum": null,
+          "maximum": null,
+          "step": null,
+          "choices": [
+            "long",
+            "short",
+            "both"
+          ],
+          "market_defaults": {
+            "us_equity": "long",
+            "crypto_24x7": "both"
+          },
+          "unit": null,
+          "description": "Which trades are allowed. Default: long only for stocks and ETFs, both for crypto."
+        }
+      ],
+      "default_risk": {
+        "max_session_loss_pct": null,
+        "max_drawdown_pct": null,
+        "max_trades_per_session": 1
+      },
+      "limits": null,
+      "note": "Results depend on the data, the period, the costs and the parameters you choose. A backtest describes the past; it does not predict future results."
+    },
+    {
+      "schema_version": 1,
+      "id": "custom",
+      "name": "Custom strategy",
+      "summary": "Your own rules, built from a fixed list of prices, indicators and comparisons.",
+      "idea": "Combine up to six entry conditions with AND for longs and for shorts, each comparing a price, an indicator or a constant. Every rule set needs a stop; a target, exit conditions and a time exit are optional. The description is data, never code.",
+      "works_when": "You want to test a specific, simple idea with the same engine, costs and honesty checks as the library strategies.",
+      "fails_when": "Rules are tuned until they fit one period of data; many conditions and parameters make that easy and the result then says little about other periods.",
+      "markets": [
+        "us_equity",
+        "crypto_24x7"
+      ],
+      "market_note": "You choose the markets the description supports; runs on other markets fail.",
+      "timeframes": [
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "4h",
+        "1d"
+      ],
+      "parameters": [],
+      "default_risk": {
+        "max_session_loss_pct": null,
+        "max_drawdown_pct": null,
+        "max_trades_per_session": 1
+      },
+      "limits": {
+        "max_entry_conditions": 6,
+        "max_exit_conditions": 3,
+        "max_parameters": 12,
+        "min_period": 2,
+        "max_period": 500,
+        "max_bars_held": 1000,
+        "max_serialized_bytes": 20000
+      },
+      "note": "Results depend on the data, the period, the costs and the parameters you choose. A backtest describes the past; it does not predict future results."
+    }
+  ]
+}

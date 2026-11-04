@@ -25,6 +25,7 @@ from app.honesty.model import CheckResult, HonestyReport, RunSummary, SweepResul
 from app.honesty.sweep import Clock, SweepError, SweepRequest, not_run, parameter_part, run_sweep
 
 CheckProgress = Callable[[str, str], None]
+CheckListener = Callable[[CheckResult], None]
 
 NO_SWEEP_REASON = "the caller chose not to sweep parameters for this run."
 CUSTOM_REASON = "the custom strategy declares no sweepable parameters."
@@ -80,6 +81,7 @@ def build_report(
     config: HonestyConfig | None = None,
     progress: CheckProgress | None = None,
     clock: Clock = time.perf_counter,
+    on_check: CheckListener | None = None,
 ) -> HonestyReport:
     config = config or HonestyConfig()
     bars = inputs.bars
@@ -94,6 +96,8 @@ def build_report(
         checks.append(check)
         if progress is not None:
             progress(check.id, check.status)
+        if on_check is not None:
+            on_check(check)
 
     plan = compile_spec(inputs.spec, bars, sessions)
     figures = costs.measure(
