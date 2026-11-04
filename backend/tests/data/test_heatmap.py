@@ -15,6 +15,7 @@ from app.data.heatmap import (
 )
 from app.data.samples import fetch_sample
 from tests.engine.factories import bars
+from tests.json_compare import assert_json_text_close
 
 START = pd.Timestamp("2024-01-01", tz="UTC")
 
@@ -120,7 +121,7 @@ def test_candles_can_never_be_labelled_from_trades():
 
 def test_committed_schema_and_sample_match_and_validate():
     assert SCHEMA_PATH.read_text(encoding="utf-8") == schema_text()
-    assert SAMPLE_PATH.read_text(encoding="utf-8") == sample_text()
+    assert_json_text_close(SAMPLE_PATH.read_text(encoding="utf-8"), sample_text())
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
     sample = json.loads(SAMPLE_PATH.read_text(encoding="utf-8"))

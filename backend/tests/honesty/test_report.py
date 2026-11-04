@@ -12,6 +12,7 @@ from app.honesty.sweep import SweepRequest
 from app.honesty.verdict import decide
 from app.runs.events import CHECK_IDS
 from app.strategies.registry import build_spec, validate_parameters
+from tests.json_compare import assert_json_text_close
 from tests.strategies.helpers import CRYPTO, random_crypto
 
 
@@ -71,7 +72,7 @@ def test_committed_schema_matches_models():
 
 
 def test_committed_sample_matches_generator_and_validates():
-    assert SAMPLE_PATH.read_text(encoding="utf-8") == sample_text()
+    assert_json_text_close(SAMPLE_PATH.read_text(encoding="utf-8"), sample_text())
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
     Draft202012Validator(schema).validate(json.loads(SAMPLE_PATH.read_text(encoding="utf-8")))

@@ -6,6 +6,16 @@ While a run executes, a canvas crawler on the chart follows the engine's real ev
 
 Research tool, not financial advice.
 
+## Screenshots
+
+![Run screen midway through a backtest: the crawler spider and its web on the price chart, the six-stage pipeline above and the live event log below](docs/screenshots/24-run-midway.png)
+
+Run screen while the engine's events are replayed. Sample-data run (`SAMPLE-A`, RSI Mean Reversion), not real market data.
+
+![Results chart with the estimated heatmap, volume profile, trade markers, equity curve and drawdown](docs/screenshots/27-results-chart-heatmap-zoomed.png)
+
+Results chart with heatmap, trade markers, equity and drawdown. Sample-data run, heatmap estimated from candles.
+
 ## The hosted site has no live engine
 
 The public site is a static page. It shows a recorded run on synthetic sample data (labelled `RECORDED RUN · SAMPLE DATA`) and these instructions. It does not run the engine, accept files or store anything. To run backtests, run Mycelium on your own machine as described below.
