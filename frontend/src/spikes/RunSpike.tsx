@@ -6,7 +6,7 @@ import { chartDataFromSample, defaultSampleOptions, generateSampleData } from '.
 import { Crawler, type CrawlerDebug, type CrawlerEventSource } from '../features/crawler/Crawler'
 import type { CrawlerHandle, CrawlerLayout, CrawlerMeasure, WrapRegion } from '../features/crawler/types'
 import { Button } from '../ui/Button'
-import { snapRegionToCandles } from './clusterSnap'
+import { snapRegionToCandles } from '../features/crawler/clusterSnap'
 import { Tag, type TagState } from '../ui/Tag'
 import {
   activeStageIndex,
@@ -16,7 +16,7 @@ import {
   reduceRunView,
   type CellState,
   type RunView,
-} from './runState'
+} from '../features/run/runView'
 
 const LOG_LIMIT = 200
 

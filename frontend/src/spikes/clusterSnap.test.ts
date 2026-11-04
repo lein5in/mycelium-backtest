@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { snapRegionToCandles } from './clusterSnap'
+import { snapRegionToCandles } from '../features/crawler/clusterSnap'
 
 const candles = [
   { time: 0, open: 10, high: 11, low: 9, close: 10.5, volume: 1 },

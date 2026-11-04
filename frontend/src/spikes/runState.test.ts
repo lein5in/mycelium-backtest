@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import sample from '../../../contracts/run_events.sample.json'
 import { isRunEvent, STAGES, type RunEvent } from '../api/runEvents'
-import { activeStageIndex, initialRunView, overallPercent, reduceRunView } from './runState'
+import { activeStageIndex, initialRunView, overallPercent, reduceRunView } from '../features/run/runView'
 
 const events: RunEvent[] = (sample as unknown[]).filter(isRunEvent)
 
