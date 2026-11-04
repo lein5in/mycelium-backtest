@@ -1,5 +1,6 @@
 import strategiesDocument from '../api/fixtures/strategies.json'
 import type { Strategies } from '../api/types'
+import { HOSTED } from './hosted'
 
 export type RoadmapItem = { title: string; detail: string }
 
@@ -16,6 +17,9 @@ export const SOON: RoadmapItem[] = [
   { title: 'Custom strategy builder', detail: 'Your own rules from a fixed list of prices, indicators and comparisons. The engine accepts them already; the editor is not built yet.' },
   { title: 'Describe a strategy in words', detail: 'Turn a plain description into a strategy spec with your own language-model API key. The result is always a checked spec, never code.' },
   { title: 'Shareable report', detail: 'A link to a read-only copy of a result.' },
+  ...(HOSTED
+    ? [{ title: 'Hosted engine', detail: 'A public site where the engine runs for you. It is not hosted today: run Mycelium on your own machine.' }]
+    : []),
   { title: 'News agent', detail: 'Context about the news around a period you test.' },
   { title: 'Forex data and pair strategies', detail: 'Currency data, and strategies that trade two related markets together.' },
 ]

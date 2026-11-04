@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { CONSENT_POINTS } from '../app/consent'
 import { Logo } from '../ui/Logo'
+import { HOSTED, REPO_URL, RUN_LOCALLY_HASH } from './hosted'
 
 const SITE_NAV = [
   { label: 'Platform', to: '/#platform' },
@@ -17,8 +18,6 @@ const FOOTER_LINKS = [
   { label: 'Data sources', to: '/data-sources' },
   { label: 'Roadmap', to: '/roadmap' },
 ]
-
-const repoUrl = import.meta.env.VITE_REPO_URL?.trim() || null
 
 export const primaryLink =
   'inline-flex min-h-11 items-center justify-center border border-accent bg-accent px-4 text-[14px] font-semibold text-app hover:brightness-110'
@@ -47,14 +46,28 @@ export function SiteShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <span className="ml-auto flex items-center gap-2">
-            {repoUrl && (
-              <a href={repoUrl} className={outlineLink} rel="noreferrer">
-                GitHub
-              </a>
+            {HOSTED ? (
+              REPO_URL ? (
+                <a href={REPO_URL} className={primaryLink} rel="noreferrer">
+                  View on GitHub
+                </a>
+              ) : (
+                <Link to={RUN_LOCALLY_HASH} className={primaryLink}>
+                  Run it locally
+                </Link>
+              )
+            ) : (
+              <>
+                {REPO_URL && (
+                  <a href={REPO_URL} className={outlineLink} rel="noreferrer">
+                    GitHub
+                  </a>
+                )}
+                <Link to="/app" className={primaryLink}>
+                  Open the app
+                </Link>
+              </>
             )}
-            <Link to="/app" className={primaryLink}>
-              Open the app
-            </Link>
           </span>
         </div>
       </header>
@@ -90,7 +103,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             ))}
           </nav>
           <div>
-            <p className="m-0 text-[13px] font-medium text-ink-2">What you accept before your first run</p>
+            <p className="m-0 text-[13px] font-medium text-ink-2">{HOSTED ? 'What you accept before your first local run' : 'What you accept before your first run'}</p>
             <ul className="mt-2 mb-0 flex max-w-[80ch] list-none flex-col gap-1 p-0 text-[13px] leading-relaxed text-ink-3">
               {CONSENT_POINTS.map((point) => (
                 <li key={point}>{point}</li>

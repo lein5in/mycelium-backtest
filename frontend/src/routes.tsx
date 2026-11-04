@@ -1,6 +1,7 @@
-import type { RouteObject } from 'react-router'
+import { redirect, type RouteObject } from 'react-router'
 import { NotFound } from './pages/NotFound'
 import { RouteLoading } from './pages/RouteLoading'
+import { RUN_LOCALLY_HASH } from './site/hosted'
 
 const spikeRoutes: RouteObject[] = import.meta.env.DEV
   ? [
@@ -27,7 +28,7 @@ const spikeRoutes: RouteObject[] = import.meta.env.DEV
     ]
   : []
 
-export const appChildren: RouteObject[] = [
+const liveAppChildren: RouteObject[] = [
   { index: true, lazy: async () => ({ Component: (await import('./pages/ConfigPage')).ConfigPage }) },
   { path: 'run/:id', lazy: async () => ({ Component: (await import('./pages/RunPage')).RunPage }) },
   { path: 'results/:id', lazy: async () => ({ Component: (await import('./pages/ResultsPage')).ResultsPage }) },
@@ -35,6 +36,22 @@ export const appChildren: RouteObject[] = [
   { path: 'data-sources', lazy: async () => ({ Component: (await import('./pages/DataSourcesPage')).DataSourcesPage }) },
   { path: '*', Component: NotFound },
 ]
+
+export const hostedAppRoutes: RouteObject[] = [
+  { path: '/app', loader: () => redirect(RUN_LOCALLY_HASH) },
+  { path: '/app/*', loader: () => redirect(RUN_LOCALLY_HASH) },
+]
+
+const liveAppRoutes: RouteObject[] = [
+  {
+    path: '/app',
+    HydrateFallback: RouteLoading,
+    lazy: async () => ({ Component: (await import('./app/AppShell')).AppShell }),
+    children: liveAppChildren,
+  },
+]
+
+const appRoutes = import.meta.env.VITE_HOSTED === '1' ? hostedAppRoutes : liveAppRoutes
 
 export const publicRoutes: RouteObject[] = [
   { path: '/', HydrateFallback: RouteLoading, lazy: async () => ({ Component: (await import('./site/Landing')).Landing }) },
@@ -52,12 +69,7 @@ export function buildRoutes(includeSpikes: boolean): RouteObject[] {
   return [
     ...publicRoutes,
     ...(includeSpikes ? spikeRoutes : []),
-    {
-      path: '/app',
-      HydrateFallback: RouteLoading,
-      lazy: async () => ({ Component: (await import('./app/AppShell')).AppShell }),
-      children: appChildren,
-    },
+    ...appRoutes,
     { path: '*', Component: NotFound },
   ]
 }

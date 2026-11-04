@@ -100,11 +100,12 @@ describe('landing', () => {
     renderPath('/')
     await screen.findByRole('heading', { level: 1, name: 'Backtesting that tells you the truth.' }, { timeout: 10_000 })
     const headings = screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent)
-    expect(headings.slice(0, 5)).toEqual([
+    expect(headings.slice(0, 6)).toEqual([
       'You see the engine work',
       'An honesty report on every run',
       'Strategy library',
       'Roadmap',
+      'Run it locally',
       'Research tool, not financial advice',
     ])
     expect(screen.getByRole('region', { name: 'Facts' })).toBeInTheDocument()

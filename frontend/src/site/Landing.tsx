@@ -6,6 +6,8 @@ import { loadRecordedRun, type RecordedRun } from '../features/recorded/recorded
 import { useIntroPlaying } from '../features/intro/introState'
 import { Tag } from '../ui/Tag'
 import { AVAILABLE_NOW, FUTURE, LIBRARY, SOON, type RoadmapItem } from './content'
+import { HOSTED, REPO_URL, RUN_LOCALLY_HASH } from './hosted'
+import { RunLocally } from './RunLocally'
 import { SiteShell } from './SiteShell'
 
 type Load = { status: 'loading' } | { status: 'ready'; run: RecordedRun } | { status: 'error' }
@@ -16,6 +18,48 @@ const FACTS = [
   { term: 'Checks', detail: 'Six honesty checks on every run, ending in a verdict: credible, fragile or not credible.' },
   { term: 'Access', detail: 'Runs from your browser with no account. Your history stays on your device.' },
 ]
+
+const HOSTED_FACTS = FACTS.map((fact) =>
+  fact.term === 'Access' ? { ...fact, detail: 'Runs on your own machine with no account. Nothing leaves it except the public crypto data you ask for.' } : fact,
+)
+
+const blockClass = 'group flex min-h-11 flex-col gap-1 bg-panel px-4 py-3 hover:bg-hover'
+
+function HeroLaunch() {
+  if (HOSTED) {
+    return (
+      <>
+        <p className="m-0 border-l-2 border-warn-text pl-3 text-[14px] leading-relaxed text-ink">
+          The live engine is not hosted on this site. Watch a recorded run below or run Mycelium on your own machine.
+        </p>
+        <div className="grid gap-px border border-line bg-line">
+          <Link to={RUN_LOCALLY_HASH} className={blockClass}>
+            <span className="font-mono text-[12px] tracking-[0.1em] text-accent-text">RUN IT ON YOUR MACHINE</span>
+            <span className="text-[14px] text-ink">Install the backend and the frontend locally. Steps below, no account.</span>
+          </Link>
+          {REPO_URL && (
+            <a href={REPO_URL} rel="noreferrer" className={blockClass}>
+              <span className="font-mono text-[12px] tracking-[0.1em] text-accent-text">VIEW SOURCE ON GITHUB</span>
+              <span className="text-[14px] text-ink">Read the code, the strategies and the honesty checks.</span>
+            </a>
+          )}
+        </div>
+      </>
+    )
+  }
+  return (
+    <div className="grid gap-px border border-line bg-line">
+      <Link to="/app" className={blockClass}>
+        <span className="font-mono text-[12px] tracking-[0.1em] text-accent-text">RUN IN YOUR BROWSER</span>
+        <span className="text-[14px] text-ink">Pick a library strategy and a crypto pair or sample set, then run it. No account.</span>
+      </Link>
+      <Link to="/app?market=csv" className={blockClass}>
+        <span className="font-mono text-[12px] tracking-[0.1em] text-accent-text">IMPORT YOUR OWN CSV</span>
+        <span className="text-[14px] text-ink">Use your own stock, ETF or crypto bars. The file is processed in memory and not kept.</span>
+      </Link>
+    </div>
+  )
+}
 
 function useHashScroll() {
   const { hash } = useLocation()
@@ -116,16 +160,7 @@ export function Landing() {
               data it was not tuned on, and next to random entries. Crypto comes from public exchange data; for stocks and ETFs, bring
               your own CSV or try the labelled sample sets.
             </p>
-            <div className="grid gap-px border border-line bg-line">
-              <Link to="/app" className="group flex min-h-11 flex-col gap-1 bg-panel px-4 py-3 hover:bg-hover">
-                <span className="font-mono text-[12px] tracking-[0.1em] text-accent-text">RUN IN YOUR BROWSER</span>
-                <span className="text-[14px] text-ink">Pick a library strategy and a crypto pair or sample set, then run it. No account.</span>
-              </Link>
-              <Link to="/app?market=csv" className="group flex min-h-11 flex-col gap-1 bg-panel px-4 py-3 hover:bg-hover">
-                <span className="font-mono text-[12px] tracking-[0.1em] text-accent-text">IMPORT YOUR OWN CSV</span>
-                <span className="text-[14px] text-ink">Use your own stock, ETF or crypto bars. The file is processed in memory and not kept.</span>
-              </Link>
-            </div>
+            <HeroLaunch />
           </div>
           <div className="min-w-0">{run ? <RecordedRunFrame run={run} className="aspect-auto h-[460px] lg:h-[520px]" /> : <FramePlaceholder failed={load.status === 'error'} />}</div>
         </div>
@@ -133,7 +168,7 @@ export function Landing() {
 
       <section aria-label="Facts" className="border-b border-line">
         <dl className="mx-auto m-0 grid w-full max-w-[1320px] sm:grid-cols-2 lg:grid-cols-4">
-          {FACTS.map((fact) => (
+          {(HOSTED ? HOSTED_FACTS : FACTS).map((fact) => (
             <div key={fact.term} className="flex flex-col gap-1.5 border-b border-line px-4 py-6 sm:px-6 sm:odd:border-r lg:border-r lg:border-b-0 lg:last:border-r-0">
               <dt className="text-[15px] font-semibold text-ink">{fact.term}</dt>
               <dd className="m-0 text-[14px] leading-relaxed text-ink-2">{fact.detail}</dd>
@@ -281,6 +316,7 @@ export function Landing() {
           </Link>
         </div>
       </section>
+      <RunLocally />
     </SiteShell>
   )
 }

@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { Tag } from '../ui/Tag'
 import { AVAILABLE_NOW, FUTURE, SOON, TERMS_UPDATED, type RoadmapItem } from './content'
 import { DataSourcesContent } from './DataSourcesContent'
+import { HOSTED, RUN_LOCALLY_HASH } from './hosted'
 import { SiteShell } from './SiteShell'
 
 function Page({ title, intro, children }: { title: string; intro: ReactNode; children: ReactNode }) {
@@ -34,6 +35,33 @@ export function PrivacyPage() {
       <Section title="No account, no tracking">
         <p className="m-0">There are no user accounts. There is no tracking, no analytics, no advertising and no cookies. The pages load no third-party scripts, fonts or images.</p>
       </Section>
+      {HOSTED ? <HostedPrivacySections /> : <LivePrivacySections />}
+    </Page>
+  )
+}
+
+function HostedPrivacySections() {
+  return (
+    <>
+      <Section title="This site runs no engine">
+        <p className="m-0">The engine is not hosted on this site. It receives no CSV file, no strategy and no run request, and it stores no result. Nothing you type on these pages is sent to a server of ours.</p>
+      </Section>
+      <Section title="What stays in your browser">
+        <p className="m-0">The opening animation remembers in this tab’s session storage that it was shown. If you run Mycelium on your own machine, your acceptance of the terms and your run history are stored in that browser on that machine, and nowhere else.</p>
+      </Section>
+      <Section title="Hosting logs">
+        <p className="m-0">The hosting provider that serves these pages may keep standard server logs, such as the address of the visitor and the page requested. We add no analytics and do not read these logs to track anyone.</p>
+      </Section>
+      <Section title="When you run it on your machine">
+        <p className="m-0">A local installation processes everything on your computer. An imported CSV file stays in memory and is discarded after the run. Public crypto candles are requested from the exchange you choose and may be cached on your own disk. None of it is sent to us.</p>
+      </Section>
+    </>
+  )
+}
+
+function LivePrivacySections() {
+  return (
+    <>
       <Section title="What stays in your browser">
         <p className="m-0">Your acceptance of the terms is stored in this browser’s local storage. Your run history is stored in this browser’s IndexedDB: the settings of each run, a summary, and the full result when it fits under 3 MB. The opening animation remembers in session storage that it was shown. None of this is sent anywhere, and you can delete the history from the History page.</p>
       </Section>
@@ -49,7 +77,7 @@ export function PrivacyPage() {
       <Section title="Market data">
         <p className="m-0">Public crypto candles fetched from exchanges may be cached on the server’s disk for a limited time so the same request does not reach the exchange twice. This cache holds market data only, nothing about you.</p>
       </Section>
-    </Page>
+    </>
   )
 }
 
@@ -64,6 +92,11 @@ export function TermsPage() {
         </>
       }
     >
+      {HOSTED && (
+        <Section title="What this site is">
+          <p className="m-0">This site presents the project and a recorded run on synthetic sample data. It does not run the engine and it does not accept files. You can run the software on your own machine; the steps are on the home page.</p>
+        </Section>
+      )}
       <Section title="A research tool">
         <p className="m-0">Mycelium Backtest describes how a set of rules behaved on past data. It is not speculative and it is not financial, investment, tax or legal advice. Nothing on it is a recommendation to buy or sell anything.</p>
       </Section>
@@ -77,7 +110,11 @@ export function TermsPage() {
         <p className="m-0">Market data comes from public sources whose own terms apply; each dataset shows its source and a link on the Data sources page. Synthetic sample sets are not real prices. You are responsible for having the right to use any file you import.</p>
       </Section>
       <Section title="Acceptable use and limits">
-        <p className="m-0">Use the service for your own research. Do not try to break it, overload it, get around its limits, or use it to collect market data in bulk. Each run has limits on its date range, file size, number of random draws and running time, and each IP address has limits on runs per hour and at the same time.</p>
+        {HOSTED ? (
+          <p className="m-0">Use the software for your own research. Do not use it to collect market data in bulk or to overload a data provider. Each run has limits on its date range, file size, number of random draws and running time.</p>
+        ) : (
+          <p className="m-0">Use the service for your own research. Do not try to break it, overload it, get around its limits, or use it to collect market data in bulk. Each run has limits on its date range, file size, number of random draws and running time, and each IP address has limits on runs per hour and at the same time.</p>
+        )}
       </Section>
       <Section title="Limitation of liability">
         <p className="m-0">To the extent the law allows, the authors are not liable for any loss or damage arising from the use of the service or from decisions made with it, including trading losses.</p>
@@ -98,6 +135,7 @@ export function PublicDataSourcesPage() {
           Where each dataset comes from, how its heatmap is built, and the attribution it carries. For public endpoints we have not
           verified a licence: see each provider’s terms. Heatmaps built from candles spread each candle’s volume over its price range
           and are always labelled ESTIMATED FROM CANDLES.
+          {HOSTED && ' This site does not fetch any market data: the sources below are what the software uses when you run it on your own machine.'}
         </p>
       }
     >
@@ -132,7 +170,15 @@ export function RoadmapPage() {
       intro={
         <p className="m-0">
           What the product does today, what is planned next and what comes later. No dates are promised, and nothing listed under Soon
-          or Future releases works yet. <Link className="text-accent-text underline" to="/app">Open the app</Link> to use what is available.
+          or Future releases works yet. {HOSTED ? (
+            <>
+              <Link className="text-accent-text underline" to={RUN_LOCALLY_HASH}>Run it locally</Link> to use what is available.
+            </>
+          ) : (
+            <>
+              <Link className="text-accent-text underline" to="/app">Open the app</Link> to use what is available.
+            </>
+          )}
         </p>
       }
     >
