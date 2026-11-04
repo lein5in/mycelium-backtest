@@ -2,6 +2,8 @@
 
 Mycelium Backtest runs a trading strategy on past market data and tells you how much of the result survives an honesty check. Every run is tested for six problems: costs left out, too few trades, one lucky trade, rules tuned on the same data, a result that random entries match, and a result that depends on one period or one parameter choice. The verdict is credible, fragile or not credible, and the report shows the rules that decided it.
 
+Live site: [https://mycelium-backtest.vercel.app/](https://mycelium-backtest.vercel.app/)
+
 While a run executes, a canvas crawler on the chart follows the engine's real events. It may lag the engine, never lead it.
 
 Research tool, not financial advice.
@@ -15,6 +17,14 @@ Run screen while the engine's events are replayed. Sample-data run (`SAMPLE-A`, 
 ![Results chart with the estimated heatmap, volume profile, trade markers, equity curve and drawdown](docs/screenshots/27-results-chart-heatmap-zoomed.png)
 
 Results chart with heatmap, trade markers, equity and drawdown. Sample-data run, heatmap estimated from candles.
+
+### Demo
+
+<video src="docs/screenshots/demo.mp4" controls muted width="100%"></video>
+
+[Watch the demo (docs/screenshots/demo.mp4)](docs/screenshots/demo.mp4)
+
+Recorded run on sample data (SAMPLE-A), not real market data.
 
 ## The hosted site has no live engine
 
