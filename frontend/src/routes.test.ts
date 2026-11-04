@@ -11,6 +11,6 @@ describe('buildRoutes', () => {
   })
 
   it('leaves spike routes out otherwise', () => {
-    expect(paths(false)).toEqual(['/', '/app', '*'])
+    expect(paths(false)).toEqual(['/', '/privacy', '/terms', '/data-sources', '/roadmap', '/app', '*'])
   })
 })

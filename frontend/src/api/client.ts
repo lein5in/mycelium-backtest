@@ -9,6 +9,7 @@ import {
   isStrategies,
   type Guard,
 } from './guards'
+import { isRunResult, type RunResultPayload } from './result'
 import type { CsvPreview, Health, Limits, Markets, RunCreated, RunStatusDocument, Strategies } from './types'
 
 export const CLIENT_CODES = ['engine_unreachable', 'request_timeout', 'bad_response', 'aborted'] as const
@@ -134,6 +135,9 @@ export const getRunStatus = (runId: string, options?: RequestOptions): Promise<R
   request(`/api/runs/${encodeURIComponent(runId)}`, isRunStatus, options)
 export const cancelRun = (runId: string, options?: RequestOptions): Promise<RunStatusDocument> =>
   request(`/api/runs/${encodeURIComponent(runId)}`, isRunStatus, { ...options, method: 'DELETE' })
+
+export const getRunResult = (runId: string, options?: RequestOptions): Promise<RunResultPayload> =>
+  request(`/api/runs/${encodeURIComponent(runId)}/result`, isRunResult, { timeoutMs: 60_000, ...options })
 
 export const postRun = (body: unknown, options?: RequestOptions): Promise<RunCreated> =>
   request('/api/runs', isRunCreated, { ...options, method: 'POST', json: body, timeoutMs: 30_000 })

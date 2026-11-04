@@ -13,6 +13,7 @@ import {
   rangeError,
   runBody,
   serverFieldErrors,
+  stateFromRequest,
   switchSource,
   validate,
   withProvider,
@@ -137,5 +138,28 @@ describe('request and summary', () => {
       byId('orb'),
     )
     expect(Object.keys(errors).sort()).toEqual(['costs.fee_pct', 'data.end', 'parameters.range_minutes'])
+  })
+})
+
+describe('stateFromRequest', () => {
+  const today = new Date('2026-11-04T00:00:00Z')
+
+  it('rebuilds the configuration of a provider run so the same request comes out', () => {
+    let state = initialState(providers, strategies, today)
+    state = withStrategy(state, 'rsi_mean_reversion', strategies)
+    state = { ...state, feePct: '0.1', slippageBps: '3', capital: '25000', randomDraws: '500', sweep: false, seed: '9', maxDrawdownPct: '20' }
+    const request = runBody(state, byId('rsi_mean_reversion'))
+    const rebuilt = stateFromRequest(request, providers, strategies, today)
+    expect(runBody(rebuilt, byId('rsi_mean_reversion'))).toEqual(request)
+  })
+
+  it('prefills a CSV run without any file and keeps the market', () => {
+    let state = switchSource(initialState(providers, strategies, today), 'csv', providers, strategies, today)
+    state = { ...withStrategy({ ...state, csvMarket: 'crypto_24x7' }, 'donchian_breakout', strategies) }
+    const options = csvRunOptions(state, byId('donchian_breakout'), '1h')
+    const rebuilt = stateFromRequest(options, providers, strategies, today)
+    expect(rebuilt.source).toBe('csv')
+    expect(rebuilt.csvMarket).toBe('crypto_24x7')
+    expect(rebuilt.strategyId).toBe('donchian_breakout')
   })
 })

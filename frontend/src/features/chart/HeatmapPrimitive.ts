@@ -1,32 +1,38 @@
 import type { IPrimitivePaneRenderer, IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
+import { columnSpans, completedColumns, type ColumnSpans } from './columns'
 import { heatmapPixels, type Rgb } from './heatmapColor'
 import { SeriesPrimitiveBase, type RenderTarget } from './primitiveBase'
 import type { HeatmapGrid } from './types'
 
-type Rect = { left: number; top: number; width: number; height: number }
+export type HeatmapSlice = { column: number; count: number; left: number; right: number }
+
+export type HeatmapFrame = { top: number; bottom: number; slices: HeatmapSlice[] }
 
 class HeatmapRenderer implements IPrimitivePaneRenderer {
   constructor(
     private readonly image: HTMLCanvasElement | null,
-    private readonly rect: Rect | null,
+    private readonly frame: HeatmapFrame | null,
   ) {}
 
   draw(target: RenderTarget): void {
-    const { image, rect } = this
-    if (!image || !rect || rect.width <= 0 || rect.height <= 0) return
+    const { image, frame } = this
+    if (!image || !frame || frame.bottom <= frame.top) return
     target.useBitmapCoordinateSpace(({ context, horizontalPixelRatio, verticalPixelRatio }) => {
-      const left = Math.round(rect.left * horizontalPixelRatio)
-      const top = Math.round(rect.top * verticalPixelRatio)
-      const right = Math.round((rect.left + rect.width) * horizontalPixelRatio)
-      const bottom = Math.round((rect.top + rect.height) * verticalPixelRatio)
+      const top = Math.round(frame.top * verticalPixelRatio)
+      const bottom = Math.round(frame.bottom * verticalPixelRatio)
       context.imageSmoothingEnabled = false
-      context.drawImage(image, 0, 0, image.width, image.height, left, top, right - left, bottom - top)
+      for (const slice of frame.slices) {
+        const left = Math.round(slice.left * horizontalPixelRatio)
+        const right = Math.round(slice.right * horizontalPixelRatio)
+        if (right <= left) continue
+        context.drawImage(image, slice.column, 0, slice.count, image.height, left, top, right - left, bottom - top)
+      }
     })
   }
 }
 
 class HeatmapPaneView implements IPrimitivePaneView {
-  rect: Rect | null = null
+  frame: HeatmapFrame | null = null
 
   constructor(private readonly owner: HeatmapPrimitive) {}
 
@@ -35,19 +41,20 @@ class HeatmapPaneView implements IPrimitivePaneView {
   }
 
   renderer(): IPrimitivePaneRenderer {
-    return new HeatmapRenderer(this.owner.image, this.rect)
+    return new HeatmapRenderer(this.owner.image, this.frame)
   }
 }
 
 export class HeatmapPrimitive extends SeriesPrimitiveBase {
   image: HTMLCanvasElement | null = null
   private grid: HeatmapGrid | null = null
-  private firstLogical = 0
+  private spans: ColumnSpans | null = null
+  private cursor: number | null = null
   private readonly view = new HeatmapPaneView(this)
 
-  setGrid(grid: HeatmapGrid, firstLogical: number, ramp: readonly Rgb[]): void {
+  setGrid(grid: HeatmapGrid, barTimes: ArrayLike<number>, ramp: readonly Rgb[]): void {
     this.grid = grid
-    this.firstLogical = firstLogical
+    this.spans = columnSpans(grid, barTimes)
     const canvas = document.createElement('canvas')
     canvas.width = grid.columns
     canvas.height = grid.rows
@@ -61,23 +68,47 @@ export class HeatmapPrimitive extends SeriesPrimitiveBase {
     this.requestUpdate()
   }
 
+  setCursor(cursor: number | null): void {
+    this.cursor = cursor
+    this.requestUpdate()
+  }
+
+  columnSpans(): ColumnSpans | null {
+    return this.spans
+  }
+
   updateAllViews(): void {
-    const grid = this.grid
-    if (!grid) return
+    const { grid, spans } = this
     const spacing = this.barSpacing()
-    const firstX = this.barToX(this.firstLogical)
-    const top = this.priceToY(grid.lowest_price + grid.rows * grid.price_bucket)
-    const bottom = this.priceToY(grid.lowest_price)
-    if (firstX === null || top === null || bottom === null || spacing <= 0) {
-      this.view.rect = null
+    const top = grid ? this.priceToY(grid.lowest_price + grid.rows * grid.price_bucket) : null
+    const bottom = grid ? this.priceToY(grid.lowest_price) : null
+    const width = this.chart?.timeScale().width() ?? 0
+    if (!grid || !spans || top === null || bottom === null || spacing <= 0) {
+      this.view.frame = null
       return
     }
-    this.view.rect = {
-      left: firstX - spacing / 2,
-      top,
-      width: grid.columns * spacing,
-      height: bottom - top,
+    const allowed = completedColumns(spans, this.cursor)
+    const slices: HeatmapSlice[] = []
+    if (spans.uniform) {
+      const start = this.barToX(spans.first[0] ?? 0)
+      if (start !== null && allowed > 0) {
+        slices.push({ column: 0, count: allowed, left: start - spacing / 2, right: start - spacing / 2 + allowed * spacing })
+      }
+    } else {
+      for (let column = 0; column < allowed; column += 1) {
+        const first = spans.first[column] ?? -1
+        const last = spans.last[column] ?? -1
+        if (first < 0) continue
+        const firstX = this.barToX(first)
+        const lastX = this.barToX(last)
+        if (firstX === null || lastX === null) continue
+        const left = firstX - spacing / 2
+        const right = lastX + spacing / 2
+        if (right < 0 || left > width) continue
+        slices.push({ column, count: 1, left, right })
+      }
     }
+    this.view.frame = { top, bottom, slices }
   }
 
   paneViews(): readonly IPrimitivePaneView[] {

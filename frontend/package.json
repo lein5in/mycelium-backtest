@@ -13,7 +13,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "typecheck": "tsc -b",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "record-demo": "node scripts/record-demo.mjs",
+    "screenshots:results": "node scripts/results-flow.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",

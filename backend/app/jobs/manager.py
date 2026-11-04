@@ -4,7 +4,7 @@ import multiprocessing
 import threading
 import time
 import uuid
-from collections import OrderedDict, deque
+from collections import Counter, OrderedDict, deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -13,10 +13,11 @@ from typing import Any, Literal
 from pydantic import ValidationError
 
 from app.config import Settings
+from app.data.registry import MIN_INTERVALS
 from app.errors import ApiError
 from app.jobs.limits import Clock, RunQuota
 from app.jobs.requests import Job
-from app.jobs.worker import run_child
+from app.jobs.worker import run_child, spare_child
 from app.runs.events import RunEvent, Stage, run_event_adapter
 
 logger = logging.getLogger("mycelium.jobs")
@@ -27,6 +28,8 @@ POLL_SECONDS = 0.05
 JOIN_SECONDS = 5.0
 CAPACITY_RETRY_SECONDS = 15
 GZIP_LEVEL = 6
+KEEPER_SECONDS = 0.5
+RATE_LIMITED_PROVIDERS = frozenset(name for name, gap in MIN_INTERVALS.items() if gap > 0)
 ChildTarget = Callable[..., None]
 
 
@@ -48,12 +51,36 @@ class RunRecord:
     result: bytes | None = None
     result_gzip: bytes | None = None
     subscribers: int = 0
+    provider: str | None = None
     cancel: threading.Event = field(default_factory=threading.Event)
     lock: threading.Lock = field(default_factory=threading.Lock)
 
     @property
     def finished(self) -> bool:
         return self.status in TERMINAL
+
+
+@dataclass
+class Spare:
+    process: multiprocessing.process.BaseProcess
+    connection: Any
+    ready: bool = False
+
+    def poll_ready(self) -> bool:
+        if not self.ready and self.process.is_alive():
+            try:
+                if self.connection.poll(0):
+                    kind, _ = self.connection.recv()
+                    self.ready = kind == "ready"
+            except (EOFError, OSError):
+                return False
+        return self.ready
+
+
+def provider_of(job: Job | None) -> str | None:
+    if job is None or job.kind != "provider":
+        return None
+    return job.options.data.provider
 
 
 @dataclass(frozen=True)
@@ -78,15 +105,28 @@ class JobManager:
         self._queue: deque[str] = deque()
         self._threads: dict[str, threading.Thread] = {}
         self._processes: dict[str, multiprocessing.process.BaseProcess] = {}
+        self._providers: Counter[str] = Counter()
         self._lock = threading.Lock()
         self._closed = False
+        self._spares: list[Spare] = []
+        self._spare_lock = threading.Lock()
+        self._keeper: threading.Thread | None = None
+        self._keeper_wake = threading.Event()
+        self._keeper_stop = threading.Event()
+
+    def warm(self) -> None:
+        with self._lock:
+            if self._closed or self._keeper is not None or self.settings.warm_spares <= 0:
+                return
+            self._keeper = threading.Thread(target=self._keep, name="run-spares", daemon=True)
+            self._keeper.start()
 
     def submit(self, job: Job, owner: str, csv_content: bytes | None = None) -> RunRecord:
         with self._lock:
             if self._closed:
                 raise ApiError("capacity_busy", "The server is shutting down.", retry_after=30)
             self._purge()
-            busy = len(self._threads) >= self.settings.max_concurrent_runs
+            busy = not self._can_start(provider_of(job))
             if busy and len(self._queue) >= self.settings.queue_size:
                 raise ApiError(
                     "capacity_busy",
@@ -161,6 +201,18 @@ class JobManager:
         with self._lock:
             return sum(1 for process in self._processes.values() if process.is_alive())
 
+    def live_spares(self) -> int:
+        with self._spare_lock:
+            return sum(1 for spare in self._spares if spare.process.is_alive())
+
+    def ready_spares(self) -> int:
+        with self._spare_lock:
+            return sum(1 for spare in self._spares if spare.poll_ready())
+
+    def spare_pids(self) -> list[int]:
+        with self._spare_lock:
+            return [spare.process.pid for spare in self._spares if spare.process.pid is not None]
+
     def purge(self) -> None:
         with self._lock:
             self._purge()
@@ -176,6 +228,15 @@ class JobManager:
             threads = list(self._threads.values())
             for run_id in self._threads:
                 self._records[run_id].cancel.set()
+            keeper = self._keeper
+        self._keeper_stop.set()
+        self._keeper_wake.set()
+        if keeper is not None:
+            keeper.join(JOIN_SECONDS * 2)
+        with self._spare_lock:
+            spares, self._spares = self._spares, []
+        for spare in spares:
+            self._discard(spare)
         for thread in threads:
             thread.join(JOIN_SECONDS * 2)
 
@@ -193,7 +254,17 @@ class JobManager:
                 del self._records[run_id]
                 excess -= 1
 
+    def _can_start(self, provider: str | None) -> bool:
+        if len(self._threads) >= self.settings.max_concurrent_runs:
+            return False
+        if provider in RATE_LIMITED_PROVIDERS:
+            return self._providers[provider] < self.settings.runs_per_rate_limited_provider
+        return True
+
     def _start(self, record: RunRecord) -> None:
+        record.provider = provider_of(record.job)
+        if record.provider is not None:
+            self._providers[record.provider] += 1
         record.status = "running"
         record.stage = "DATA"
         record.started_at = datetime.now(UTC)
@@ -243,21 +314,76 @@ class JobManager:
         record.job = None
         record.csv_content = None
 
+    def _keep(self) -> None:
+        while not self._keeper_stop.is_set():
+            self._replenish()
+            self._keeper_wake.wait(KEEPER_SECONDS)
+            self._keeper_wake.clear()
+
+    def _replenish(self) -> None:
+        with self._spare_lock:
+            dead = [spare for spare in self._spares if not spare.process.is_alive()]
+            self._spares = [spare for spare in self._spares if spare.process.is_alive()]
+            missing = self.settings.warm_spares - len(self._spares)
+        for spare in dead:
+            self._discard(spare)
+        for _ in range(missing):
+            if self._keeper_stop.is_set():
+                return
+            spare = self._spawn_spare()
+            with self._spare_lock:
+                if self._keeper_stop.is_set():
+                    self._discard(spare)
+                    return
+                self._spares.append(spare)
+
+    def _spawn_spare(self) -> Spare:
+        parent, child = self.context.Pipe(duplex=True)
+        process = self.context.Process(
+            target=spare_child, args=(child, self.target), name="mycelium-spare", daemon=True
+        )
+        process.start()
+        child.close()
+        return Spare(process, parent)
+
+    def _discard(self, spare: Spare) -> None:
+        if spare.process.is_alive():
+            spare.process.kill()
+        spare.process.join(JOIN_SECONDS)
+        spare.connection.close()
+
+    def _take_spare(self, message: tuple) -> Spare | None:
+        while True:
+            with self._spare_lock:
+                if not self._spares:
+                    return None
+                spare = self._spares.pop(0)
+            self._keeper_wake.set()
+            if not spare.process.is_alive():
+                self._discard(spare)
+                continue
+            try:
+                spare.connection.send(message)
+            except (EOFError, OSError):
+                self._discard(spare)
+                continue
+            return spare
+
     def _spawn(self, record: RunRecord):
+        message = (record.run_id, record.job, self.settings.model_dump(), record.csv_content)
+        record.csv_content = None
+        spare = self._take_spare(message)
+        if spare is not None:
+            with self._lock:
+                self._processes[record.run_id] = spare.process
+            return spare.connection, spare.process
         receiver, sender = self.context.Pipe(duplex=False)
         process = self.context.Process(
             target=self.target,
-            args=(
-                sender,
-                record.run_id,
-                record.job,
-                self.settings.model_dump(),
-                record.csv_content,
-            ),
+            args=(sender, *message),
             name=f"mycelium-run-{record.run_id[:8]}",
             daemon=True,
         )
-        record.csv_content = None
         with self._lock:
             self._processes[record.run_id] = process
         process.start()
@@ -343,10 +469,18 @@ class JobManager:
         with self._lock:
             self._threads.pop(record.run_id, None)
             self._processes.pop(record.run_id, None)
+            if record.provider is not None:
+                self._providers[record.provider] -= 1
             self.quota.release(record.owner)
-            while (
-                self._queue
-                and not self._closed
-                and len(self._threads) < self.settings.max_concurrent_runs
-            ):
-                self._start(self._records[self._queue.popleft()])
+            self._start_queued()
+
+    def _start_queued(self) -> None:
+        if self._closed:
+            return
+        for run_id in list(self._queue):
+            if len(self._threads) >= self.settings.max_concurrent_runs:
+                return
+            queued = self._records[run_id]
+            if self._can_start(provider_of(queued.job)):
+                self._queue.remove(run_id)
+                self._start(queued)

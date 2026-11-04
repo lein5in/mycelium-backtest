@@ -51,6 +51,7 @@ async function newPage(browser, options = {}) {
   if (options.consent !== false) {
     await context.addInitScript(([key, value]) => window.localStorage.setItem(key, value), CONSENT)
   }
+  await context.addInitScript(() => window.sessionStorage.setItem('mycelium.intro', '1'))
   const page = await context.newPage()
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(`${page.url()} ${message.text()}`)

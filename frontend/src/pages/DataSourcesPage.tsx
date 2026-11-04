@@ -3,6 +3,7 @@ import { getMarkets } from '../api/client'
 import { describeError } from '../api/errorMessages'
 import type { Markets } from '../api/types'
 import { MARKET_LABELS } from '../features/config/configModel'
+import { DataSourcesContent } from '../site/DataSourcesContent'
 import { Button } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { ErrorPanel, SkeletonRows } from '../ui/States'
@@ -102,6 +103,11 @@ export function DataSourcesPage() {
             ]}
           />
         )}
+      </Panel>
+      <Panel label="Sources, attribution and terms">
+        <div className="px-3">
+          <DataSourcesContent />
+        </div>
       </Panel>
     </div>
   )

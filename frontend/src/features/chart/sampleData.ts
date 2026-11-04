@@ -1,5 +1,6 @@
 import { mulberry32 } from '../../lib/random'
-import { cellIndex, type Candle, type HeatmapGrid, type SampleData, type SampleTrade } from './types'
+import { cellIndex, type Candle, type ChartData, type HeatmapGrid, type SampleData, type SampleTrade } from './types'
+import { buildVolumeProfile } from './volumeProfile'
 
 type SampleOptions = {
   seed: number
@@ -119,4 +120,18 @@ export function generateSampleData(options: SampleOptions = defaultSampleOptions
   const grid = estimateGridFromCandles(candles, options.rows, options.barSeconds)
   const trades = pickTrades(random, candles)
   return { candles, grid, trades }
+}
+
+export function chartDataFromSample(sample: SampleData): ChartData {
+  const profile = buildVolumeProfile(sample.grid, 0, sample.grid.columns - 1)
+  return {
+    candles: sample.candles,
+    grid: sample.grid,
+    trades: sample.trades.map((trade, id) => ({ ...trade, id })),
+    profile: {
+      buy: profile.rows.map((row) => row.buy),
+      sell: profile.rows.map((row) => row.sell),
+      pocRow: profile.pocRow >= 0 ? profile.pocRow : null,
+    },
+  }
 }

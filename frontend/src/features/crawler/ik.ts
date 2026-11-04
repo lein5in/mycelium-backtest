@@ -9,6 +9,7 @@ export function solveTwoBone(
   lower: number,
   outwardFrom: Point,
   forward: Point,
+  forwardBias = 0.15,
 ): TwoBoneSolution {
   const dx = target.x - hip.x
   const dy = target.y - hip.y
@@ -28,7 +29,7 @@ export function solveTwoBone(
   const right = { x: -forward.y, y: forward.x }
   const score = (knee: Point) =>
     Math.abs((knee.x - outwardFrom.x) * right.x + (knee.y - outwardFrom.y) * right.y) +
-    0.15 * ((knee.x - hip.x) * forward.x + (knee.y - hip.y) * forward.y)
+    forwardBias * ((knee.x - hip.x) * forward.x + (knee.y - hip.y) * forward.y)
   const knee = score(first) >= score(second) ? first : second
   return { knee, foot, reached: rawDistance <= maxReach + 1e-6 }
 }

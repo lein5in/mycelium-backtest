@@ -1,6 +1,7 @@
 import { useCallback, useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate, useSearchParams } from 'react-router'
 import { ApiError, postCsvRun, postRun } from '../api/client'
+import type { RunRequestDocument } from '../api/result'
 import { describeError, type DescribedError } from '../api/errorMessages'
 import { fieldProblems } from '../api/guards'
 import type { MarketKind } from '../api/types'
@@ -19,6 +20,7 @@ import {
   runBody,
   serverFieldErrors,
   SOURCE_LABELS,
+  stateFromRequest,
   switchSource,
   validate,
   withProvider,
@@ -26,7 +28,9 @@ import {
   type ConfigState,
   type FieldErrors,
   type SourceKind,
+  type StoredRequest,
 } from '../features/config/configModel'
+import { entryFromRequest, history } from '../features/history/historyStore'
 import { CsvImport, type CsvSelection } from '../features/csv/CsvImport'
 import { blocksRun } from '../features/csv/csvModel'
 import { StrategyCard } from '../features/strategies/StrategyCard'
@@ -82,8 +86,15 @@ function ConfigWorkbench({ catalog }: { catalog: Catalog }) {
   const providers = markets.providers
   const list = strategies.strategies
   const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
   const consent = useConsent()
-  const [state, setState] = useState<ConfigState>(() => initialState(providers, list))
+  const prefill = (location.state as { request?: StoredRequest } | null)?.request ?? null
+  const [state, setState] = useState<ConfigState>(() => {
+    if (prefill) return stateFromRequest(prefill, providers, list)
+    const initial = initialState(providers, list)
+    return searchParams.get('market') === 'csv' ? switchSource(initial, 'csv', providers, list) : initial
+  })
   const [touched, setTouched] = useState(false)
   const [serverErrors, setServerErrors] = useState<FieldErrors>({})
   const [submitError, setSubmitError] = useState<DescribedError | null>(null)
@@ -120,14 +131,23 @@ function ConfigWorkbench({ catalog }: { catalog: Catalog }) {
     if (state.source === 'csv' && (!csv.file || csvBlocked)) return
     setSubmitting(true)
     try {
+      const csvRun = state.source === 'csv' && csv.file
+      const options = csvRun ? csvRunOptions(state, strategy, csv.preview?.timeframe ?? null) : runBody(state, strategy)
       const created =
-        state.source === 'csv' && csv.file
-          ? await postCsvRun(
-              { file: csv.file, timezone: csv.timezone || null, columns: csv.columns },
-              csvRunOptions(state, strategy, csv.preview?.timeframe ?? null),
-            )
-          : await postRun(runBody(state, strategy))
-      navigate(`/app/run/${created.run_id}`)
+        csvRun && csv.file
+          ? await postCsvRun({ file: csv.file, timezone: csv.timezone || null, columns: csv.columns }, options)
+          : await postRun(options)
+      const request = options as RunRequestDocument
+      await history
+        .put(
+          entryFromRequest(created.run_id, request, {
+            strategyName: strategy.name,
+            market: market,
+            sourceMode: csvRun ? 'USER CSV' : (provider?.mode ?? null),
+          }),
+        )
+        .catch(() => undefined)
+      navigate(`/app/run/${created.run_id}`, { state: { request } })
     } catch (caught) {
       const problems = caught instanceof ApiError ? fieldProblems(caught.details) : []
       setServerErrors(serverFieldErrors(problems, strategy))
@@ -143,6 +163,12 @@ function ConfigWorkbench({ catalog }: { catalog: Catalog }) {
   return (
     <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
       <h1 className="sr-only-text">New run</h1>
+      {prefill && (
+        <p role="status" className="m-0 border-b border-line bg-panel-head px-3 py-1.5 text-[12.5px] text-ink-2">
+          Settings copied from a previous run.{" "}
+          {prefill.csv ? "Choose the CSV file again: files are never stored." : "Check them, then launch."}
+        </p>
+      )}
       <div className="grid min-w-0 flex-1 gap-px bg-line xl:grid-cols-[350px_minmax(0,1fr)_360px]">
         <div className="order-2 flex min-w-0 flex-col gap-px bg-app xl:order-1">
           <Panel label="Market · data">

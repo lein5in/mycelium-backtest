@@ -31,6 +31,8 @@ class Settings(BaseSettings):
 
     max_concurrent_runs: Annotated[int, Field(ge=1, le=64)] = 2
     queue_size: Annotated[int, Field(ge=0, le=1_000)] = 10
+    warm_spares: Annotated[int, Field(ge=0, le=8)] = 2
+    runs_per_rate_limited_provider: Annotated[int, Field(ge=1, le=64)] = 1
     run_timeout_seconds: Annotated[float, Field(gt=0, le=3_600)] = 120.0
     child_memory_mb: Annotated[int, Field(ge=0, le=65_536)] = 2_048
     retention_minutes: Annotated[float, Field(gt=0, le=1_440)] = 30.0

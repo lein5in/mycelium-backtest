@@ -34,21 +34,6 @@ def wait_finished(manager: JobManager, run_id: str, timeout: float = 30.0):
     raise AssertionError("run did not finish")
 
 
-@pytest.fixture
-def managers():
-    created: list[JobManager] = []
-
-    def make(target=quick_child, clock=time.monotonic, **overrides) -> JobManager:
-        manager = JobManager(settings(**overrides), clock=clock, target=target)
-        created.append(manager)
-        return manager
-
-    yield make
-    for manager in created:
-        manager.shutdown()
-        assert manager.live_processes() == 0
-
-
 def test_capacity_and_queue_limits(managers):
     manager = managers(stuck_child, max_concurrent_runs=2, queue_size=1, run_timeout_seconds=30)
     running = [manager.submit(job(), f"k{i}") for i in range(2)]

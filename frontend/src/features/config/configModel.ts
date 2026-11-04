@@ -325,3 +325,64 @@ export function serverFieldErrors(problems: FieldProblem[], strategy: StrategyMe
 export function formatCount(value: number): string {
   return value.toLocaleString('en-US')
 }
+
+export type StoredRequest = {
+  strategy_id: string
+  parameters?: Record<string, number | string> | null
+  costs?: { fee_pct: number; fixed_fee: number; slippage: { unit: string; value: number } } | null
+  risk?: { max_trades_per_session: number; max_session_loss_pct: number | null; max_drawdown_pct: number | null } | null
+  sizing?: { type: string; fraction?: number } | null
+  initial_capital?: number
+  honesty?: { random_draws: number; seed: number; sweep: boolean } | null
+  data?: { provider: string; symbol: string; timeframe: Timeframe; start: string; end: string }
+  csv?: { market: MarketKind; timeframe?: Timeframe }
+}
+
+const text = (value: number | null | undefined, fallback: string) =>
+  value === null || value === undefined ? fallback : String(value)
+
+export function stateFromRequest(
+  request: StoredRequest,
+  providers: ProviderInfo[],
+  strategies: StrategyMetadata[],
+  today: Date = new Date(),
+): ConfigState {
+  let state = initialState(providers, strategies, today)
+  if (request.data) {
+    const provider = providers.find((info) => info.id === request.data?.provider)
+    const source: SourceKind = provider?.markets.includes('crypto_24x7') ? 'crypto' : 'stocks'
+    state = switchSource(state, source, providers, strategies, today)
+    state = withProvider(state, request.data.provider, providers)
+    state = {
+      ...state,
+      symbol: request.data.symbol,
+      timeframe: request.data.timeframe,
+      start: request.data.start.slice(0, 10),
+      end: request.data.end.slice(0, 10),
+    }
+  } else if (request.csv) {
+    state = { ...switchSource(state, 'csv', providers, strategies, today), csvMarket: request.csv.market }
+  }
+  if (strategies.some((item) => item.id === request.strategy_id)) {
+    state = withStrategy(state, request.strategy_id, strategies)
+  }
+  const params = { ...state.params }
+  for (const [name, value] of Object.entries(request.parameters ?? {})) {
+    if (name in params) params[name] = String(value)
+  }
+  return {
+    ...state,
+    params,
+    feePct: text(request.costs?.fee_pct, state.feePct),
+    fixedFee: text(request.costs?.fixed_fee, state.fixedFee),
+    slippageBps: request.costs?.slippage.unit === 'bps' ? String(request.costs.slippage.value) : state.slippageBps,
+    maxTradesPerSession: text(request.risk?.max_trades_per_session, state.maxTradesPerSession),
+    maxSessionLossPct: request.risk ? text(request.risk.max_session_loss_pct, '') : state.maxSessionLossPct,
+    maxDrawdownPct: request.risk ? text(request.risk.max_drawdown_pct, '') : state.maxDrawdownPct,
+    sizingPct: request.sizing?.fraction !== undefined ? String(Math.round(request.sizing.fraction * 10_000) / 100) : state.sizingPct,
+    capital: text(request.initial_capital, state.capital),
+    randomDraws: text(request.honesty?.random_draws, state.randomDraws),
+    sweep: request.honesty?.sweep ?? state.sweep,
+    seed: text(request.honesty?.seed, state.seed),
+  }
+}

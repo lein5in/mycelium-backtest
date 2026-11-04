@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { STAGES, type RunEvent, type Stage, type Verdict } from '../api/runEvents'
 import { createFakeRun, createRealRun, openRunEvents, type ScenarioName } from '../api/runs'
 import { HeatmapChart, type ChartProjection } from '../features/chart/HeatmapChart'
-import { defaultSampleOptions, generateSampleData } from '../features/chart/sampleData'
+import { chartDataFromSample, defaultSampleOptions, generateSampleData } from '../features/chart/sampleData'
 import { Crawler, type CrawlerDebug, type CrawlerEventSource } from '../features/crawler/Crawler'
 import type { CrawlerHandle, CrawlerLayout, CrawlerMeasure, WrapRegion } from '../features/crawler/types'
 import { Button } from '../ui/Button'
@@ -73,7 +73,10 @@ type LogLine = { seq: number; text: string; tone: 'normal' | 'fail' }
 export function RunSpike() {
   const [chartBars, setChartBars] = useState(defaultSampleOptions.bars)
   const chartBarsRef = useRef(defaultSampleOptions.bars)
-  const data = useMemo(() => generateSampleData({ ...defaultSampleOptions, bars: chartBars }), [chartBars])
+  const data = useMemo(
+    () => chartDataFromSample(generateSampleData({ ...defaultSampleOptions, bars: chartBars })),
+    [chartBars],
+  )
   const resolveRegion = useCallback((region: WrapRegion) => snapRegionToCandles(region, data.candles), [data])
   const stageRef = useRef<HTMLDivElement>(null)
   const chartBoxRef = useRef<HTMLDivElement>(null)
@@ -136,7 +139,7 @@ export function RunSpike() {
         const low = projection.yToPrice(pane.height)
         return high === null || low === null ? null : { low, high }
       },
-      anchors: () => projection.anchors.map((cell) => ({ bar: cell.column, price: cell.price })),
+      anchors: () => projection.anchors,
       priceAt: (bar) => data.candles[Math.round(bar)]?.close ?? null,
       subscribe: (listener) => {
         const timeScale = projection.chart.timeScale()
@@ -299,7 +302,7 @@ export function RunSpike() {
             })}
           </div>
           <div ref={chartBoxRef} className="relative min-h-0 flex-1">
-            <HeatmapChart data={data} showTrades={false} onReady={setProjection} />
+            <HeatmapChart data={data} sourceMode="SAMPLE DATA" showTrades={false} onReady={setProjection} />
           </div>
           <Crawler
             ref={crawlerRef}

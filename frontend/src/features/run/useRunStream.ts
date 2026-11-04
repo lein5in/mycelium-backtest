@@ -21,6 +21,7 @@ export function useRunStream(runId: string, factory: SourceFactory = openSource)
   const [state, dispatch] = useReducer(streamReducer, { events: [], lastSeq: -1 })
   const [connection, setConnection] = useState<Connection>('connecting')
   const [unreadable, setUnreadable] = useState(0)
+  const [firstAt, setFirstAt] = useState<number | null>(null)
 
   useEffect(() => {
     const source = factory(eventsUrl(`/api/runs/${encodeURIComponent(runId)}/events`))
@@ -33,6 +34,7 @@ export function useRunStream(runId: string, factory: SourceFactory = openSource)
         return
       }
       dispatch(event)
+      setFirstAt((current) => current ?? performance.now())
       if (isTerminal(event)) {
         finished = true
         source.close()
@@ -49,5 +51,5 @@ export function useRunStream(runId: string, factory: SourceFactory = openSource)
     }
   }, [runId, factory])
 
-  return { ...state, connection, unreadable }
+  return { ...state, connection, unreadable, firstAt }
 }

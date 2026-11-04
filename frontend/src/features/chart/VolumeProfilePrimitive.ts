@@ -1,8 +1,7 @@
 import type { IPrimitivePaneRenderer, IPrimitivePaneView, PrimitivePaneViewZOrder } from 'lightweight-charts'
 import { withAlpha, type Theme } from '../../theme/tokens'
 import { SeriesPrimitiveBase, type RenderTarget } from './primitiveBase'
-import type { HeatmapGrid } from './types'
-import { buildVolumeProfile, type VolumeProfile } from './volumeProfile'
+import type { ChartProfile, HeatmapGrid } from './types'
 
 const MAX_WIDTH = 150
 const WIDTH_SHARE = 0.16
@@ -73,55 +72,47 @@ class VolumeProfilePaneView implements IPrimitivePaneView {
 
 export class VolumeProfilePrimitive extends SeriesPrimitiveBase {
   private grid: HeatmapGrid | null = null
-  private firstLogical = 0
-  private cacheKey = ''
-  private profile: VolumeProfile | null = null
+  private profile: ChartProfile | null = null
+  private hidden = false
   private readonly view = new VolumeProfilePaneView(this)
 
   constructor(readonly theme: Theme) {
     super()
   }
 
-  setGrid(grid: HeatmapGrid, firstLogical: number): void {
+  setProfile(grid: HeatmapGrid, profile: ChartProfile): void {
     this.grid = grid
-    this.firstLogical = firstLogical
-    this.cacheKey = ''
+    this.profile = profile
     this.requestUpdate()
   }
 
-  private visibleProfile(): VolumeProfile | null {
-    const grid = this.grid
-    const range = this.chart?.timeScale().getVisibleLogicalRange()
-    if (!grid || !range) return null
-    const from = Math.floor(range.from - this.firstLogical)
-    const to = Math.ceil(range.to - this.firstLogical)
-    const key = `${from}:${to}`
-    if (key !== this.cacheKey || !this.profile) {
-      this.profile = buildVolumeProfile(grid, from, to)
-      this.cacheKey = key
-    }
-    return this.profile
+  setHidden(hidden: boolean): void {
+    this.hidden = hidden
+    this.requestUpdate()
   }
 
   updateAllViews(): void {
-    const grid = this.grid
-    const profile = this.visibleProfile()
-    if (!grid || !profile) {
+    const { grid, profile } = this
+    if (!grid || !profile || this.hidden) {
       this.view.frame = null
       return
     }
     const rows: RowGeometry[] = []
-    profile.rows.forEach((row, index) => {
+    let peak = 0
+    for (let index = 0; index < grid.rows; index += 1) {
+      const buy = profile.buy[index] ?? 0
+      const sell = profile.sell[index] ?? 0
+      peak = Math.max(peak, buy + sell)
       const lowY = this.priceToY(grid.lowest_price + index * grid.price_bucket)
       const highY = this.priceToY(grid.lowest_price + (index + 1) * grid.price_bucket)
-      if (lowY === null || highY === null) return
-      rows.push({ top: highY, height: lowY - highY, buy: row.buy, sell: row.sell })
-    })
+      if (lowY === null || highY === null) continue
+      rows.push({ top: highY, height: lowY - highY, buy, sell })
+    }
     const pocY =
-      profile.pocRow >= 0
+      profile.pocRow !== null && profile.pocRow >= 0
         ? this.priceToY(grid.lowest_price + (profile.pocRow + 0.5) * grid.price_bucket)
         : null
-    this.view.frame = { rows, peak: profile.peak, pocY }
+    this.view.frame = { rows, peak, pocY }
   }
 
   paneViews(): readonly IPrimitivePaneView[] {

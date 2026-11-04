@@ -19,6 +19,7 @@ def create_app(settings: Settings | None = None, jobs: JobManager | None = None)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        jobs.warm()
         yield
         jobs.shutdown()
 

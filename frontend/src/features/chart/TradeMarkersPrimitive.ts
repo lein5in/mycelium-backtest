@@ -6,18 +6,20 @@ import type {
 } from 'lightweight-charts'
 import { withAlpha, type Theme } from '../../theme/tokens'
 import { SeriesPrimitiveBase, type RenderTarget } from './primitiveBase'
-import type { SampleTrade } from './types'
+import type { ChartTrade } from './types'
 
 const MARKER_SIZE = 5
+const TAG_LIMIT = 60
 
 type MarkerGeometry = {
-  side: SampleTrade['side']
-  win: boolean
+  side: ChartTrade['side']
+  outcome: 'win' | 'loss' | 'open'
   entryX: number
   entryY: number
-  exitX: number
-  exitY: number
-  label: string
+  exitX: number | null
+  exitY: number | null
+  label: string | null
+  selected: boolean
 }
 
 export function formatPnl(pnl: number): string {
@@ -37,17 +39,20 @@ class TradeMarkersRenderer implements IPrimitivePaneRenderer {
       context.font = '500 10px "IBM Plex Mono", monospace'
       context.textBaseline = 'middle'
       for (const marker of this.markers) {
-        const outcome = marker.win ? theme.profit : theme.loss
-        const outcomeText = marker.win ? theme['profit-text'] : theme['loss-text']
-        context.save()
-        context.strokeStyle = withAlpha(outcome, 0.85)
-        context.lineWidth = 1
-        context.setLineDash([3, 3])
-        context.beginPath()
-        context.moveTo(marker.entryX, marker.entryY)
-        context.lineTo(marker.exitX, marker.exitY)
-        context.stroke()
-        context.restore()
+        const outcome = marker.outcome === 'win' ? theme.profit : marker.outcome === 'loss' ? theme.loss : theme['text-2']
+        const outcomeText =
+          marker.outcome === 'win' ? theme['profit-text'] : marker.outcome === 'loss' ? theme['loss-text'] : theme['text-2']
+        if (marker.exitX !== null && marker.exitY !== null) {
+          context.save()
+          context.strokeStyle = withAlpha(outcome, 0.85)
+          context.lineWidth = marker.selected ? 1.5 : 1
+          context.setLineDash([3, 3])
+          context.beginPath()
+          context.moveTo(marker.entryX, marker.entryY)
+          context.lineTo(marker.exitX, marker.exitY)
+          context.stroke()
+          context.restore()
+        }
 
         const direction = marker.side === 'long' ? -1 : 1
         context.fillStyle = theme.accent
@@ -61,22 +66,31 @@ class TradeMarkersRenderer implements IPrimitivePaneRenderer {
         context.fill()
         context.stroke()
 
-        context.fillStyle = outcome
-        context.beginPath()
-        context.moveTo(marker.exitX, marker.exitY - MARKER_SIZE)
-        context.lineTo(marker.exitX + MARKER_SIZE, marker.exitY)
-        context.lineTo(marker.exitX, marker.exitY + MARKER_SIZE)
-        context.lineTo(marker.exitX - MARKER_SIZE, marker.exitY)
-        context.closePath()
-        context.fill()
-        context.stroke()
+        if (marker.exitX !== null && marker.exitY !== null) {
+          context.fillStyle = outcome
+          context.beginPath()
+          context.moveTo(marker.exitX, marker.exitY - MARKER_SIZE)
+          context.lineTo(marker.exitX + MARKER_SIZE, marker.exitY)
+          context.lineTo(marker.exitX, marker.exitY + MARKER_SIZE)
+          context.lineTo(marker.exitX - MARKER_SIZE, marker.exitY)
+          context.closePath()
+          context.fill()
+          context.stroke()
+        }
 
+        if (marker.selected) {
+          context.strokeStyle = theme['accent-text']
+          context.lineWidth = 1
+          context.strokeRect(marker.entryX - 9.5, marker.entryY - 9.5, 19, 19)
+        }
+
+        if (marker.label === null || marker.exitX === null || marker.exitY === null) continue
         const textWidth = context.measureText(marker.label).width
         const tagX = marker.exitX + MARKER_SIZE + 4
         const tagY = marker.exitY - 7
         context.fillStyle = withAlpha(theme['bg-panel'], 0.88)
         context.fillRect(tagX, tagY, textWidth + 8, 14)
-        context.strokeStyle = withAlpha(outcome, 0.7)
+        context.strokeStyle = withAlpha(outcome, marker.selected ? 1 : 0.7)
         context.strokeRect(tagX + 0.5, tagY + 0.5, textWidth + 7, 13)
         context.fillStyle = outcomeText
         context.textAlign = 'left'
@@ -130,7 +144,8 @@ class LastPriceAxisView implements ISeriesPrimitiveAxisView {
 }
 
 export class TradeMarkersPrimitive extends SeriesPrimitiveBase {
-  private trades: SampleTrade[] = []
+  private trades: ChartTrade[] = []
+  private selected: number | null = null
   private lastPrice: { price: number; up: boolean } | null = null
   private readonly view = new TradeMarkersPaneView(this)
   private readonly lastPriceView: LastPriceAxisView
@@ -140,36 +155,49 @@ export class TradeMarkersPrimitive extends SeriesPrimitiveBase {
     this.lastPriceView = new LastPriceAxisView(theme)
   }
 
-  setTrades(trades: SampleTrade[], firstLogical: number): void {
+  setTrades(trades: readonly ChartTrade[], firstLogical = 0): void {
     this.trades = trades.map((trade) => ({
       ...trade,
       entryBar: trade.entryBar + firstLogical,
-      exitBar: trade.exitBar + firstLogical,
+      exitBar: trade.exitBar === null ? null : trade.exitBar + firstLogical,
     }))
     this.requestUpdate()
   }
 
-  setLastPrice(price: number, previous: number): void {
-    this.lastPrice = { price, up: price >= previous }
+  setSelected(id: number | null): void {
+    this.selected = id
+    this.requestUpdate()
+  }
+
+  setLastPrice(price: number | null, previous: number | null): void {
+    this.lastPrice = price === null ? null : { price, up: previous === null || price >= previous }
     this.requestUpdate()
   }
 
   updateAllViews(): void {
+    const range = this.chart?.timeScale().getVisibleLogicalRange()
+    const visible = range
+      ? this.trades.filter((trade) => (trade.exitBar ?? trade.entryBar) >= range.from - 1 && trade.entryBar <= range.to + 1)
+      : this.trades
+    const tagged = visible.length <= TAG_LIMIT
     const markers: MarkerGeometry[] = []
-    for (const trade of this.trades) {
+    for (const trade of visible) {
       const entryX = this.barToX(trade.entryBar)
-      const exitX = this.barToX(trade.exitBar)
       const entryY = this.priceToY(trade.entryPrice)
-      const exitY = this.priceToY(trade.exitPrice)
-      if (entryX === null || exitX === null || entryY === null || exitY === null) continue
+      if (entryX === null || entryY === null) continue
+      const exitX = trade.exitBar === null ? null : this.barToX(trade.exitBar)
+      const exitY = trade.exitPrice === null ? null : this.priceToY(trade.exitPrice)
+      const selected = trade.id !== undefined && trade.id === this.selected
+      const outcome = trade.pnl === null ? 'open' : trade.pnl > 0 ? 'win' : 'loss'
       markers.push({
         side: trade.side,
-        win: trade.pnl > 0,
+        outcome,
         entryX,
         entryY,
         exitX,
         exitY,
-        label: formatPnl(trade.pnl),
+        label: trade.pnl !== null && (tagged || selected) ? formatPnl(trade.pnl) : null,
+        selected,
       })
     }
     this.view.markers = markers

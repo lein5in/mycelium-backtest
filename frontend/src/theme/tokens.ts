@@ -9,6 +9,8 @@ export const tokenNames = [
   'text-2',
   'text-3',
   'accent',
+  'accent-text',
+  'bg-hover',
   'violet',
   'violet-text',
   'cyan',

@@ -17,11 +17,13 @@ export type LegGeometry = {
   hipSide: number
   restAngle: number
   restDistance: number
+  kneeBias: number
   phase: number
 }
 
 const restAngles = [34, 72, 112, 150]
-const restDistances = [0.74, 0.64, 0.64, 0.74]
+const restDistances = [0.78, 0.7, 0.7, 0.78]
+const kneeBiases = [0.15, 0.45, -0.45, 0.15]
 const hipForwards = [0.34, 0.2, 0.06, -0.08]
 const phases = [0, 0.32, 0.58, 0.18]
 
@@ -36,6 +38,7 @@ export const LEG_GEOMETRY: readonly LegGeometry[] = LEG_IDS.map((id) => {
     hipSide: 0.12,
     restAngle: ((restAngles[pair] ?? 90) * Math.PI) / 180,
     restDistance: restDistances[pair] ?? 0.9,
+    kneeBias: kneeBiases[pair] ?? 0.15,
     phase: (phases[pair] ?? 0) + (side === 1 ? 0.07 : 0),
   }
 })

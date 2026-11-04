@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { HeatmapChart, type ChartProjection } from '../features/chart/HeatmapChart'
-import { generateSampleData } from '../features/chart/sampleData'
+import { chartDataFromSample, generateSampleData } from '../features/chart/sampleData'
 import { Button } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { frameStats, probeRange, type FrameStats } from './frameStats'
@@ -14,7 +14,7 @@ declare global {
 }
 
 export function HeatmapSpike() {
-  const data = useMemo(() => generateSampleData(), [])
+  const data = useMemo(() => chartDataFromSample(generateSampleData()), [])
   const projectionRef = useRef<ChartProjection | null>(null)
   const [stats, setStats] = useState<FrameStats | null>(null)
   const [probing, setProbing] = useState(false)
@@ -74,7 +74,7 @@ export function HeatmapSpike() {
         className="min-h-0 flex-1"
       >
         <div className="h-full min-h-[420px]">
-          <HeatmapChart data={data} onReady={handleReady} />
+          <HeatmapChart data={data} sourceMode="SAMPLE DATA" onReady={handleReady} />
         </div>
       </Panel>
     </main>

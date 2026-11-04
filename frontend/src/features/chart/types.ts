@@ -30,6 +30,35 @@ export type SampleTrade = {
   pnl: number
 }
 
+export type ChartTrade = {
+  id?: number
+  side: 'long' | 'short'
+  entryBar: number
+  entryPrice: number
+  exitBar: number | null
+  exitPrice: number | null
+  pnl: number | null
+}
+
+export type ChartProfile = { buy: number[]; sell: number[]; pocRow: number | null }
+
+export type EquityPoint = { time: number; value: number }
+
+export type EquityPanes = {
+  equity: EquityPoint[]
+  withoutBest: EquityPoint[]
+  drawdown: EquityPoint[]
+  bestTradeLabel: string | null
+}
+
+export type ChartData = {
+  candles: Candle[]
+  grid: HeatmapGrid
+  trades: ChartTrade[]
+  profile?: ChartProfile
+  panes?: EquityPanes
+}
+
 export type SampleData = {
   candles: Candle[]
   grid: HeatmapGrid

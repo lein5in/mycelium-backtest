@@ -123,11 +123,31 @@ export function legLengths(spider: Spider): { upper: number; lower: number } {
   return { upper: total * 0.5, lower: total * 0.5 }
 }
 
+export const KNEE_PROJECTION = 0.4
+
+export function projectedKnee(hip: Point, knee: Point, foot: Point): Point {
+  const dx = foot.x - hip.x
+  const dy = foot.y - hip.y
+  const lengthSquared = dx * dx + dy * dy
+  if (lengthSquared < 1e-9) return knee
+  const t = ((knee.x - hip.x) * dx + (knee.y - hip.y) * dy) / lengthSquared
+  const base = { x: hip.x + dx * t, y: hip.y + dy * t }
+  return { x: base.x + (knee.x - base.x) * KNEE_PROJECTION, y: base.y + (knee.y - base.y) * KNEE_PROJECTION }
+}
+
 export function legJoints(spider: Spider, leg: Leg): { hip: Point; knee: Point; foot: Point } {
   const hip = hipPosition(spider, leg.geometry)
   const { upper, lower } = legLengths(spider)
-  const solution = solveTwoBone(hip, leg.foot, upper, lower, { x: spider.x, y: spider.y }, axes(spider).forward)
-  return { hip, knee: solution.knee, foot: solution.foot }
+  const solution = solveTwoBone(
+    hip,
+    leg.foot,
+    upper,
+    lower,
+    { x: spider.x, y: spider.y },
+    axes(spider).forward,
+    leg.geometry.kneeBias,
+  )
+  return { hip, knee: projectedKnee(hip, solution.knee, solution.foot), foot: solution.foot }
 }
 
 export const MIN_STEP_MS = 70

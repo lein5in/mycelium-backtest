@@ -1,5 +1,6 @@
 import logging
 import sys
+from collections.abc import Callable
 from multiprocessing.connection import Connection
 from typing import Any
 
@@ -31,6 +32,25 @@ def failure(error: ApiError) -> dict[str, Any]:
         "stage": error.stage,
         "details": error.details,
     }
+
+
+def warm_up() -> None:
+    from app.engine.sessions import _nyse_arrays
+
+    _nyse_arrays()
+
+
+def spare_child(connection: Connection, target: Callable[..., None]) -> None:
+    warm_up()
+    connection.send(("ready", None))
+    try:
+        message = connection.recv()
+    except (EOFError, OSError):
+        return
+    if message is None:
+        return
+    run_id, job, settings_values, csv_content = message
+    target(connection, run_id, job, settings_values, csv_content)
 
 
 def run_child(

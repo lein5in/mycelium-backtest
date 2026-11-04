@@ -49,3 +49,38 @@ describe('solveTwoBone', () => {
     expect(Number.isFinite(foot.x) && Number.isFinite(knee.x)).toBe(true)
   })
 })
+
+function at<T>(items: readonly T[], index: number): T {
+  const item = items[index]
+  if (item === undefined) throw new Error(`missing item ${index}`)
+  return item
+}
+
+describe('resting stance', () => {
+  it('never crosses the segments of two legs on the same side', async () => {
+    const { createSpider, legJoints, restPosition } = await import('./spider')
+    const spider = createSpider({ x: 0, y: 0 }, { length: 38.4, reach: 2.3, stepThreshold: 0.55, speed: 340 }, 0)
+    spider.fold = 0
+    for (const leg of spider.legs) leg.foot = restPosition(spider, leg.geometry)
+    const cross = (a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }, d: { x: number; y: number }) => {
+      const side = (p: typeof a, q: typeof a, r: typeof a) => (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x)
+      return side(a, b, c) * side(a, b, d) < 0 && side(c, d, a) * side(c, d, b) < 0
+    }
+    for (const prefix of ['L', 'R']) {
+      const legs = spider.legs.filter((leg) => leg.geometry.id.startsWith(prefix))
+      for (let first = 0; first < legs.length; first += 1) {
+        for (let second = first + 1; second < legs.length; second += 1) {
+          const a = legJoints(spider, at(legs, first))
+          const b = legJoints(spider, at(legs, second))
+          for (const [p, q] of [[a.hip, a.knee], [a.knee, a.foot]] as const) {
+            for (const [r, t] of [[b.hip, b.knee], [b.knee, b.foot]] as const) expect(cross(p, q, r, t)).toBe(false)
+          }
+        }
+      }
+      const knees = legs.map((leg) => legJoints(spider, leg).knee.x)
+      expect(at(knees, 0)).toBeGreaterThan(at(knees, 1))
+      expect(at(knees, 1)).toBeGreaterThan(at(knees, 2))
+      expect(at(knees, 2)).toBeGreaterThan(at(knees, 3))
+    }
+  })
+})
